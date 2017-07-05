@@ -425,6 +425,7 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 					}
 					if(player == owner && ticksInAir < 20)
 						continue;
+					/*
 					int snapshotToTry = TeamsManager.bulletSnapshotMin;
 					if(TeamsManager.bulletSnapshotDivisor > 0)
 					{
@@ -451,7 +452,11 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 						ArrayList<BulletHit> playerHits = snapshot.raytrace(origin, motion);
 						hits.addAll(playerHits);
 					}
+					*/
 				}
+
+				// Debug!!!
+				shouldDoNormalHitDetect = true;
 
 				//If we couldn't get a snapshot, use normal entity hitbox calculations
 				if(data == null || shouldDoNormalHitDetect)
@@ -470,7 +475,7 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 						if(hitLambda < 0)
 							hitLambda = -hitLambda;
 
-						hits.add(new PlayerBulletHit(new PlayerHitbox(player, new RotatedAxes(), new Vector3f(), new Vector3f(), new Vector3f(), EnumHitboxType.BODY), hitLambda));
+						hits.add(new PlayerBulletHit(new PlayerHitbox(player, new RotatedAxes(), new Vector3f(), new Vector3f(), new Vector3f(), hitPoint.y <= -0.2? EnumHitboxType.BODY: EnumHitboxType.HEAD), hitLambda));
 					}
 				}
 			}
