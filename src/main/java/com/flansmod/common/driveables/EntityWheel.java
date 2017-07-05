@@ -88,6 +88,12 @@ public class EntityWheel extends Entity implements IEntityAdditionalSpawnData
 	}
 	
 	@Override
+    protected boolean canTriggerWalking()
+    {
+        return false;
+    }
+	
+	@Override
 	public void onUpdate()
 	{
 		//super.onUpdate();
