@@ -90,6 +90,8 @@ public class BulletType extends ShootableType
 	public float smokeRadius = 5F;
 	public boolean TVguide = true;
 
+	public float knockback = 1;
+
 	/** The static bullets list */
 	public static List<BulletType> bullets = new ArrayList<BulletType>();
 
@@ -211,6 +213,8 @@ public class BulletType extends ShootableType
 				shootForSettingPosHeight = Integer.parseInt(split[1]);
 			else if(split[0].equals("IsDoTopAttack"))
 				isDoTopAttack = Boolean.parseBoolean(split[1].toLowerCase());
+			else if(split[0].equals("Knockback"))
+				knockback = Float.parseFloat(split[1]);
 
 
 

@@ -601,6 +601,9 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 					{
 						d *= type.damageVsEntity;
 					}
+					double mx = entityHit.entity.motionX;
+					double my = entityHit.entity.motionY;
+					double mz = entityHit.entity.motionZ;
 					if(entityHit.entity.attackEntityFrom(getBulletDamage(false), d) && entityHit.entity instanceof EntityLivingBase)
 					{
 						EntityLivingBase living = (EntityLivingBase)entityHit.entity;
@@ -612,6 +615,9 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 						living.arrowHitTimer++;
 						living.hurtResistantTime = living.maxHurtResistantTime / 2;
 					}
+					entityHit.entity.motionX = mx + ((entityHit.entity.motionX - mx) * type.knockback);
+					entityHit.entity.motionY = my + ((entityHit.entity.motionY - my) * type.knockback);
+					entityHit.entity.motionZ = mz + ((entityHit.entity.motionZ - mz) * type.knockback);
 					if(type.setEntitiesOnFire)
 						entityHit.entity.setFire(20);
 					penetratingPower -= 1F;
