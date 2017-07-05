@@ -172,8 +172,15 @@ public class PlayerHitbox
 				TeamsManager.getInstance().currentRound.gametype.playerAttacked((EntityPlayerMP)player, damagesource);
 			
 			//Attack the entity!
+			double mx = player.motionX;
+			double my = player.motionY;
+			double mz = player.motionZ;
 			if(player.attackEntityFrom(damagesource, hitDamage))
 			{
+				player.motionX = mx + ((player.motionX - mx) * bullet.type.knockback);
+				player.motionY = my + ((player.motionY - my) * bullet.type.knockback);
+				player.motionZ = mz + ((player.motionZ - mz) * bullet.type.knockback);
+
 				//If the attack was allowed, we should remove their immortality cooldown so we can shoot them again. Without this, any rapid fire gun become useless
 				player.arrowHitTimer++;
 				player.hurtResistantTime = player.maxHurtResistantTime / 2;
