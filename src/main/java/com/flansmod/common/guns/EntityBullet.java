@@ -108,6 +108,12 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 	public int submunitionDelay = 20;
 	public boolean hasSetSubDelay = false;
 
+	public int VLSDelay = 0;
+
+	public Vector3f lookVector;
+	public Vector3f initialPos;
+
+
 	public EntityBullet(World world)
 	{
 		super(world);
@@ -920,6 +926,54 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 				this.motionX = 0;
 				this.motionY = -motionab;
 				this.motionZ = 0;
+			}
+		}
+		this.renderDistanceWeight = 256D;
+		if(owner != null && type.semiAutomaticGuidance && VLSDelay <= 0 && lockedOnTo == null)
+		{
+			Vector3f lookVec;
+			Vector3f origin2;
+			lookVec = new Vector3f((float)owner.getLookVec().xCoord, (float)owner.getLookVec().yCoord,(float)owner.getLookVec().zCoord);
+			origin2 = new Vector3f(owner.posX, owner.posY, owner.posZ);
+
+			if(type.fixedDirection)
+			{
+				lookVec = lookVector;
+				origin2 = initialPos;
+			}
+			float x = (float)(posX - origin2.x);
+			float y = (float)(posY - origin2.y);
+			float z = (float)(posZ - origin2.z);
+
+			float d = (float)Math.sqrt((x*x) + (y*y) + (z*z));
+			d = d+type.turnRadius;
+
+			lookVec.normalise();
+
+			Vector3f targetPoint = new Vector3f(origin2.x + (lookVec.x*d), origin2.y + (lookVec.y*d), origin2.z + (lookVec.z*d));
+			Vector3f diff = Vector3f.sub(targetPoint, new Vector3f(posX, posY, posZ), null);
+
+			float speed2 = type.trackPhaseSpeed;
+			float turnSpeed = type.trackPhaseTurn;
+			diff.normalise();
+			turnSpeed = 0.1F;
+			Vector3f targetSpeed = new Vector3f(diff.x * speed2, diff.y * speed2, diff.z * speed2);
+
+			this.motionX += (targetSpeed.x - motionX) * turnSpeed;
+			this.motionY += (targetSpeed.y - motionY) * turnSpeed;
+			this.motionZ += (targetSpeed.z - motionZ) * turnSpeed;
+		}
+
+
+		if(type.torpedo)
+		{
+			if(isInWater()){
+				Vector3f motion2 = new Vector3f(motionX, motionY, motionZ);
+				float length = motion.length();
+				motion.normalise();
+				motionY *= 0.3F;
+				motionX = motion.x * 1;
+				motionZ = motion.z * 1;
 			}
 		}
 

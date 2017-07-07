@@ -59,6 +59,7 @@ public class BulletType extends ShootableType
 	//public int maxDegreeOfMissileZAxis = 10;
 
 	public boolean manualGuidance = false;
+	public boolean semiAutomaticGuidance  = false;
 	public int lockOnFuse = 10;
 
 	public ArrayList<PotionEffect> hitEffects = new ArrayList<PotionEffect>();
@@ -77,8 +78,8 @@ public class BulletType extends ShootableType
 	public int shootForSettingPosHeight = 100;
 
 	public boolean isDoTopAttack = false;
-	
-	
+
+
 	//Smoke
 	/** Time to remain after detonation */
 	public int smokeTime = 0;
@@ -91,6 +92,17 @@ public class BulletType extends ShootableType
 	public boolean TVguide = true;
 
 	public float knockback = 1;
+
+	//Other stuff
+	public boolean VLS = false;
+	public int VLSTime = 0;
+	public boolean fixedDirection = false;
+	public float turnRadius = 3;
+	public String boostPhaseParticle;
+	public float trackPhaseSpeed = 2;
+	public float trackPhaseTurn = 0.2F;
+
+	public boolean torpedo = false;
 
 	/** The static bullets list */
 	public static List<BulletType> bullets = new ArrayList<BulletType>();
@@ -167,6 +179,22 @@ public class BulletType extends ShootableType
 				smokeEffects.add(getPotionEffect(split));
 			else if(split[0].equals("SmokeRadius"))
 				smokeRadius = Float.parseFloat(split[1]);
+			else if(split[0].equals("VLS") || split[0].equals("HasDeadZone"))
+				VLS = Boolean.parseBoolean(split[1]);
+			else if(split[0].equals("VLSTime") || split[0].equals("DeadZoneTime"))
+				VLSTime = Integer.parseInt(split[1]);
+			else if(split[0].equals("FixedTrackDirection"))
+				fixedDirection = Boolean.parseBoolean(split[1]);
+			else if(split[0].equals("GuidedTurnRadius"))
+				turnRadius = Float.parseFloat(split[1]);
+			else if(split[0].equals("GuidedPhaseSpeed"))
+				trackPhaseSpeed = Float.parseFloat(split[1]);
+			else if(split[0].equals("GuidedPhaseTurnSpeed"))
+				trackPhaseTurn = Float.parseFloat(split[1]);
+			else if(split[0].equals("BoostParticle"))
+				boostPhaseParticle = split[1];
+			else if(split[0].equals("Torpedo"))
+				torpedo = Boolean.parseBoolean(split[1]);
 
 			else if(split[0].equals("Bomb"))
 				weaponType = EnumWeaponType.BOMB;
@@ -221,7 +249,17 @@ public class BulletType extends ShootableType
 			else if(split[0].equals("PotionEffect"))
 				hitEffects.add(getPotionEffect(split));
 			else if(split[0].equals("ManualGuidance"))
+			{
 				manualGuidance = Boolean.parseBoolean(split[1].toLowerCase());
+				if(manualGuidance)
+					semiAutomaticGuidance = false;
+			}
+			else if(split[0].equals("SemiAutomaticGuidance"))
+			{
+				semiAutomaticGuidance = Boolean.parseBoolean(split[1].toLowerCase());
+				if(manualGuidance)
+					semiAutomaticGuidance = false;
+			}
 			else if(split[0].equals("LockOnFuse"))
 				lockOnFuse = Integer.parseInt(split[1]);
 			else if(split[0].equals("MaxRange"))
