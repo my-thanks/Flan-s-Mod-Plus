@@ -113,6 +113,7 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 	public Vector3f lookVector;
 	public Vector3f initialPos;
 
+	private Entity ownerRidingEntity = null;
 
 	public EntityBullet(World world)
 	{
@@ -133,6 +134,7 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 		damage = gunDamage;
 		penetratingPower = type.penetratingPower;
 		setSize(bulletType.hitBoxSize, bulletType.hitBoxSize);
+		ownerRidingEntity = owner.ridingEntity;
 	}
 
 	/** Method called by ItemGun for creating bullets from a hand held weapon */
@@ -275,7 +277,7 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 			return;
 		}
 
-		if(owner != null && type.manualGuidance)
+		if(owner != null && type.manualGuidance && ownerRidingEntity == owner.ridingEntity)
 		{
 			this.rotationYaw = owner.rotationYaw;
 			this.rotationPitch = owner.rotationPitch;
@@ -929,7 +931,7 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 			}
 		}
 		this.renderDistanceWeight = 256D;
-		if(owner != null && type.semiAutomaticGuidance && VLSDelay <= 0 && lockedOnTo == null)
+		if(owner != null && type.semiAutomaticGuidance && ownerRidingEntity == owner.ridingEntity && VLSDelay <= 0 && lockedOnTo == null)
 		{
 			Vector3f lookVec;
 			Vector3f origin2;
@@ -1349,6 +1351,9 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 				if(((Entity)obj).getCommandSenderName().equals(name))
 					owner = (EntityPlayer)obj;
 			}
+
+			if(owner != null)
+				ownerRidingEntity = owner.ridingEntity;
 		}
 		catch(Exception e)
 		{
