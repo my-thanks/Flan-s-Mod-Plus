@@ -43,6 +43,7 @@ public class BulletType extends ShootableType
 
 	public boolean hasLight = false;
 	public float penetratingPower = 1F;
+	public float attenuationPower = 0;
 	/** Lock on variables. If true, then the bullet will search for a target at the moment it is fired */
 	public boolean lockOnToPlanes = false, lockOnToVehicles = false, lockOnToMechas = false, lockOnToPlayers = false, lockOnToLivings = false;
 	/** Lock on maximum angle for finding a target */
@@ -142,6 +143,8 @@ public class BulletType extends ShootableType
 				penetratingPower = (Boolean.parseBoolean(split[1].toLowerCase()) ? 1F : 0.25F);
 			else if(split[0].equals("Penetration") || split[0].equals("PenetratingPower"))
 				penetratingPower = Float.parseFloat(split[1]);
+			else if(split[0].equals("Attenuation") || split[0].equals("AttenuationPower"))
+				attenuationPower = Float.parseFloat(split[1]);
 
 			else if(split[0].equals("DragInAir"))
 			{
