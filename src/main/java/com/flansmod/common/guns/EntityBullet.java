@@ -1007,6 +1007,15 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 		//Temporary fire glitch fix
 		if(worldObj.isRemote)
 			extinguish();
+		
+		if(damage > 0)
+		{
+			damage -= type.attenuationPower;
+			if(damage < 0)
+			{
+				damage = 0;
+			}
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
