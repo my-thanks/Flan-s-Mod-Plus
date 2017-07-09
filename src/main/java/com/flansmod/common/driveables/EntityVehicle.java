@@ -1042,7 +1042,10 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		
 		if( wheels != null && wheels.length >= 4 )
 		{
-			speed = (float)(wheels[0].getSpeedXYZ() + wheels[1].getSpeedXYZ() + wheels[2].getSpeedXYZ() + wheels[3].getSpeedXYZ())/4;
+			if(wheels[0] != null && wheels[1] != null && wheels[2] != null && wheels[3] != null)
+			{
+				speed = (float)(wheels[0].getSpeedXYZ() + wheels[1].getSpeedXYZ() + wheels[2].getSpeedXYZ() + wheels[3].getSpeedXYZ())/4;
+			}
 		}
 
 		return speed;
