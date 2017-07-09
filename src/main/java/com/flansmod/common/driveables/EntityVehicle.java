@@ -87,6 +87,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 	
 	public boolean deployedSmoke = false;
 	
+	public Entity target = null;
 
     public EntityVehicle(World world)
     {
@@ -267,6 +268,9 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 			}
 			case 10 : //Change control mode : Do nothing
 			{
+				FlansMod.proxy.changeControlMode((EntityPlayer)seats[0].riddenByEntity);
+				seats[0].targetYaw = seats[0].looking.getYaw();
+				seats[0].targetPitch = seats[0].looking.getPitch();
 				return true;
 			}
 			case 11 : //Roll left : Do nothing
@@ -330,6 +334,29 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 				}
 				break;
             }
+            
+			case 30: // Up
+			{
+				if(seats[0].targetPitch > -seats[0].seatInfo.maxPitch)
+					seats[0].targetPitch -= seats[0].seatInfo.aimingSpeed.y;
+				return true;
+			}
+			case 31: // Down
+			{
+				if(seats[0].targetPitch < -seats[0].seatInfo.minPitch)
+					seats[0].targetPitch += seats[0].seatInfo.aimingSpeed.y;
+				return true;
+			}
+			case 32: // Left
+			{
+				seats[0].targetYaw -= seats[0].seatInfo.aimingSpeed.x;
+				return true;
+			}
+			case 33: // Right
+			{
+				seats[0].targetYaw += seats[0].seatInfo.aimingSpeed.x;
+				return true;
+			}
 		}
 		return false;
 		

@@ -23,6 +23,7 @@ import com.flansmod.api.IControllable;
 import com.flansmod.client.FlansModClient;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.RotatedAxes;
+import com.flansmod.common.driveables.mechas.EntityMecha;
 import com.flansmod.common.guns.EnumFireMode;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.ItemShootable;
@@ -88,6 +89,10 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	private boolean shooting;
 
 	public Entity lastRiddenByEntity;
+	
+	public float targetYaw = 0;
+	
+	public float targetPitch = 0;
 
 	public int timeLimitDriveableNull = 0;
 
@@ -135,6 +140,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		//prevPosX = posX;
 		//prevPosY = posY;
 		//prevPosZ = posZ;
+		
 
 		if(driver && riddenByEntity==null)
 		{
@@ -210,7 +216,6 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
             yawSoundDelay = 0;
             pitchSoundDelay = 0;
         }
-
 
 		//If on the client
 		if(worldObj.isRemote)
@@ -398,8 +403,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	{
 		if(!foundDriveable)
 			return;
-
-
+		
 		prevLooking = looking.clone();
 		prevPlayerLooking = playerLooking.clone();
 
@@ -468,7 +472,13 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			//Consider new Yaw and Yaw limiters
 			if(driveable.disabled) return;
 
-			float targetX = playerLooking.getYaw();
+			float targetX;
+			
+			if(FlansModClient.controlModeMouse || !driver ||(driveable instanceof EntityPlane)||(driveable instanceof EntityMecha))
+				targetX = playerLooking.getYaw();
+			else
+				targetX = targetYaw;
+			
 			
 			float yawToMove = (targetX - looking.getYaw());
 			for(; yawToMove > 180F; yawToMove -= 360F) {}
@@ -487,7 +497,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			float newYaw = 0f;
 
 			if(seatInfo.legacyAiming == true || (signDeltaX == 0 && deltaX == 0)){
-				newYaw = playerLooking.getYaw();
+				newYaw = targetX;
 			} else {
 				newYaw = looking.getYaw() + signDeltaX*seatInfo.aimingSpeed.x;
 			}
@@ -527,6 +537,8 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 
 			//Calculate the new pitch and consider pitch limiters
 			float targetY = playerLooking.getPitch();
+			
+			if(!FlansModClient.controlModeMouse && driver && !(driveable instanceof EntityPlane) && !(driveable instanceof EntityMecha)) targetY = targetPitch;
 
 			float pitchToMove = (targetY - looking.getPitch());
 			for(; pitchToMove > 180F; pitchToMove -= 360F) {}
@@ -558,8 +570,8 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			currentYawToMove = (float)Math.sqrt((yawToMove)*(yawToMove));
 
 			if(seatInfo.legacyAiming == true || (signDeltaY == 0 && deltaY == 0)){
-				newPitch = playerLooking.getPitch();
-			} else  if (seatInfo.yawBeforePitch == false && currentYawToMove < minYawToMove){
+				newPitch = targetY;
+			} else  if (seatInfo.yawBeforePitch == false && currentYawToMove < minYawToMove || !FlansModClient.controlModeMouse){
 				newPitch = looking.getPitch() + signDeltaY*seatInfo.aimingSpeed.y;
 			} else if (seatInfo.yawBeforePitch == true && signDeltaX == 0){
 				newPitch = looking.getPitch() + signDeltaY*seatInfo.aimingSpeed.y;
@@ -575,7 +587,8 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 				newPitch = -seatInfo.maxPitch;
 
 			//Now set the new angles
-			looking.setAngles(newYaw, newPitch, 0F);
+			if((driveable instanceof EntityVehicle && ((EntityVehicle)driveable).target == null) || !(driveable instanceof EntityVehicle))
+				looking.setAngles(newYaw, newPitch, 0F);
 
 			FlansMod.getPacketHandler().sendToServer(new PacketSeatUpdates(this));
 
@@ -591,6 +604,11 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 				playPitchSound = true;
 			} else {
 				playPitchSound = false;
+			}
+			
+			if((driveable instanceof EntityVehicle && ((EntityVehicle)driveable).target != null)){
+				playPitchSound = false;
+				playYawSound = false;
 			}
 			
 	        //Play traverse sounds
@@ -634,6 +652,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			}
 			return false;
 		}
+		
 	
 		//Exit key pressed
 		if(key == 6 && riddenByEntity != null)
@@ -842,4 +861,5 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	{
 		return minigunSpeed;
 	}
+	
 }
