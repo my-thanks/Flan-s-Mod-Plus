@@ -353,7 +353,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 
         for(Entity e : findEntitiesWithinbounds())
         {
-        	if(e != this){
+        	if(e != this && e instanceof EntityBullet == false){
         		moveRiders(e);
         	}
         }
