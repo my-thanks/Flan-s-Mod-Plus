@@ -229,6 +229,8 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 
 	protected void initType(DriveableType type, boolean clientSide)
 	{
+		setSize(type.getWidth(), type.getHeight());
+
 		seats = new EntitySeat[type.numPassengers + 1];
 		for(int i = 0; i < type.numPassengers + 1; i++)
 		{

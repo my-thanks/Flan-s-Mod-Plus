@@ -38,6 +38,9 @@ public class DriveableType extends InfoType
 	public HashMap<EnumDriveablePart, ItemStack[]> partwiseRecipe = new HashMap<EnumDriveablePart, ItemStack[]>();
 	/** Recipe parts as one complete list */
 	public ArrayList<ItemStack> recipe = new ArrayList<ItemStack>();
+	
+	private float maxCollisionX = 1, maxCollisionY = 1, maxCollisionZ = 1;
+	private float collisionWidth = 0, collisionHeight = 0;
 
 	//Ammo
 	/** If true, then all ammo is accepted. Default is true to minimise backwards compatibility issues */
@@ -659,6 +662,17 @@ public class DriveableType extends InfoType
 				EnumDriveablePart part = EnumDriveablePart.getPart(split[1]);
 				CollisionBox box = new CollisionBox(Integer.parseInt(split[2]), Integer.parseInt(split[3]), Integer.parseInt(split[4]), Integer.parseInt(split[5]), Integer.parseInt(split[6]), Integer.parseInt(split[7]), Integer.parseInt(split[8]));
 				health.put(part, box);
+				if(part != EnumDriveablePart.tail)
+				{
+					maxCollisionX = Math.max(maxCollisionX, Math.max(Math.abs(box.x), Math.abs(box.x + box.w)));
+					maxCollisionY = Math.max(maxCollisionY, Math.max(Math.abs(box.y), Math.abs(box.y + box.h)));
+					maxCollisionZ = Math.max(maxCollisionZ, Math.max(Math.abs(box.z), Math.abs(box.z + box.d)));
+				}
+			}
+			else if(split[0].equals("Size"))
+			{
+				collisionWidth  = Math.max(0.5F, Float.parseFloat(split[1]) / 16F);
+				collisionHeight = Math.max(0.5F, Float.parseFloat(split[2]) / 16F);
 			}
 
 			//Driver Position
@@ -915,6 +929,15 @@ public class DriveableType extends InfoType
 			}
 		}
 	}
+
+    public float getWidth()
+    {
+    	return collisionWidth > 0? collisionWidth: (maxCollisionX + maxCollisionZ) / 2;
+    }
+    public float getHeight()
+    {
+    	return collisionHeight > 0? collisionHeight: maxCollisionY;
+    }
 
     private DriveablePosition getShootPoint(String[] split)
     {

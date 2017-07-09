@@ -1,9 +1,21 @@
 package com.flansmod.common.driveables;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.flansmod.common.vector.Vector3f;
 
@@ -222,5 +234,258 @@ public class EntityWheel extends Entity implements IEntityAdditionalSpawnData
 		
 		if(vehicle != null)
 			setPosition(posX, posY, posZ);
+	}
+	
+
+	public void moveEntity(double p_70091_1_, double p_70091_3_, double p_70091_5_)
+	{
+		if (this.noClip)
+		{
+			this.boundingBox.offset(p_70091_1_, p_70091_3_, p_70091_5_);
+			this.posX = (this.boundingBox.minX + this.boundingBox.maxX) / 2.0D;
+			this.posY = this.boundingBox.minY + (double)this.yOffset - (double)this.ySize;
+			this.posZ = (this.boundingBox.minZ + this.boundingBox.maxZ) / 2.0D;
+		}
+		else
+		{
+			this.worldObj.theProfiler.startSection("move");
+			this.ySize *= 0.4F;
+			double d3 = this.posX;
+			double d4 = this.posY;
+			double d5 = this.posZ;
+
+			if (this.isInWeb)
+			{
+				this.isInWeb = false;
+				p_70091_1_ *= 0.25D;
+				p_70091_3_ *= 0.05000000074505806D;
+				p_70091_5_ *= 0.25D;
+				this.motionX = 0.0D;
+				this.motionY = 0.0D;
+				this.motionZ = 0.0D;
+			}
+
+			double d6 = p_70091_1_;
+			double d7 = p_70091_3_;
+			double d8 = p_70091_5_;
+			AxisAlignedBB axisalignedbb = this.boundingBox.copy();
+			boolean flag = false;
+
+			List list = this.getCollidingBoundingBoxes(this, this.boundingBox.addCoord(p_70091_1_, p_70091_3_, p_70091_5_));
+
+			for (int i = 0; i < list.size(); ++i)
+			{
+				p_70091_3_ = ((AxisAlignedBB)list.get(i)).calculateYOffset(this.boundingBox, p_70091_3_);
+			}
+
+			this.boundingBox.offset(0.0D, p_70091_3_, 0.0D);
+
+			if (!this.field_70135_K && d7 != p_70091_3_)
+			{
+				p_70091_5_ = 0.0D;
+				p_70091_3_ = 0.0D;
+				p_70091_1_ = 0.0D;
+			}
+
+			boolean flag1 = this.onGround || d7 != p_70091_3_ && d7 < 0.0D;
+			int j;
+
+			for (j = 0; j < list.size(); ++j)
+			{
+				p_70091_1_ = ((AxisAlignedBB)list.get(j)).calculateXOffset(this.boundingBox, p_70091_1_);
+			}
+
+			this.boundingBox.offset(p_70091_1_, 0.0D, 0.0D);
+
+			if (!this.field_70135_K && d6 != p_70091_1_)
+			{
+				p_70091_5_ = 0.0D;
+				p_70091_3_ = 0.0D;
+				p_70091_1_ = 0.0D;
+			}
+
+			for (j = 0; j < list.size(); ++j)
+			{
+				p_70091_5_ = ((AxisAlignedBB)list.get(j)).calculateZOffset(this.boundingBox, p_70091_5_);
+			}
+
+			this.boundingBox.offset(0.0D, 0.0D, p_70091_5_);
+
+			if (!this.field_70135_K && d8 != p_70091_5_)
+			{
+				p_70091_5_ = 0.0D;
+				p_70091_3_ = 0.0D;
+				p_70091_1_ = 0.0D;
+			}
+
+			double d10;
+			double d11;
+			int k;
+			double d12;
+
+			if (this.stepHeight > 0.0F && flag1 && (flag || this.ySize < 0.05F) && (d6 != p_70091_1_ || d8 != p_70091_5_))
+			{
+				d12 = p_70091_1_;
+				d10 = p_70091_3_;
+				d11 = p_70091_5_;
+				p_70091_1_ = d6;
+				p_70091_3_ = (double)this.stepHeight;
+				p_70091_5_ = d8;
+				AxisAlignedBB axisalignedbb1 = this.boundingBox.copy();
+				this.boundingBox.setBB(axisalignedbb);
+				list = this.getCollidingBoundingBoxes(this, this.boundingBox.addCoord(d6, p_70091_3_, d8));
+
+				for (k = 0; k < list.size(); ++k)
+				{
+					p_70091_3_ = ((AxisAlignedBB)list.get(k)).calculateYOffset(this.boundingBox, p_70091_3_);
+				}
+
+				this.boundingBox.offset(0.0D, p_70091_3_, 0.0D);
+
+				if (!this.field_70135_K && d7 != p_70091_3_)
+				{
+					p_70091_5_ = 0.0D;
+					p_70091_3_ = 0.0D;
+					p_70091_1_ = 0.0D;
+				}
+
+				for (k = 0; k < list.size(); ++k)
+				{
+					p_70091_1_ = ((AxisAlignedBB)list.get(k)).calculateXOffset(this.boundingBox, p_70091_1_);
+				}
+
+				this.boundingBox.offset(p_70091_1_, 0.0D, 0.0D);
+
+				if (!this.field_70135_K && d6 != p_70091_1_)
+				{
+					p_70091_5_ = 0.0D;
+					p_70091_3_ = 0.0D;
+					p_70091_1_ = 0.0D;
+				}
+
+				for (k = 0; k < list.size(); ++k)
+				{
+					p_70091_5_ = ((AxisAlignedBB)list.get(k)).calculateZOffset(this.boundingBox, p_70091_5_);
+				}
+
+				this.boundingBox.offset(0.0D, 0.0D, p_70091_5_);
+
+				if (!this.field_70135_K && d8 != p_70091_5_)
+				{
+					p_70091_5_ = 0.0D;
+					p_70091_3_ = 0.0D;
+					p_70091_1_ = 0.0D;
+				}
+
+				if (!this.field_70135_K && d7 != p_70091_3_)
+				{
+					p_70091_5_ = 0.0D;
+					p_70091_3_ = 0.0D;
+					p_70091_1_ = 0.0D;
+				}
+				else
+				{
+					p_70091_3_ = (double)(-this.stepHeight);
+
+					for (k = 0; k < list.size(); ++k)
+					{
+						p_70091_3_ = ((AxisAlignedBB)list.get(k)).calculateYOffset(this.boundingBox, p_70091_3_);
+					}
+
+					this.boundingBox.offset(0.0D, p_70091_3_, 0.0D);
+				}
+
+				if (d12 * d12 + d11 * d11 >= p_70091_1_ * p_70091_1_ + p_70091_5_ * p_70091_5_)
+				{
+					p_70091_1_ = d12;
+					p_70091_3_ = d10;
+					p_70091_5_ = d11;
+					this.boundingBox.setBB(axisalignedbb1);
+				}
+			}
+
+			this.worldObj.theProfiler.endSection();
+			this.worldObj.theProfiler.startSection("rest");
+			this.posX = (this.boundingBox.minX + this.boundingBox.maxX) / 2.0D;
+			this.posY = this.boundingBox.minY + (double)this.yOffset - (double)this.ySize;
+			this.posZ = (this.boundingBox.minZ + this.boundingBox.maxZ) / 2.0D;
+			this.isCollidedHorizontally = d6 != p_70091_1_ || d8 != p_70091_5_;
+			this.isCollidedVertically = d7 != p_70091_3_;
+			this.onGround = d7 != p_70091_3_ && d7 < 0.0D;
+			this.isCollided = this.isCollidedHorizontally || this.isCollidedVertically;
+			this.updateFallState(p_70091_3_, this.onGround);
+
+			if (d6 != p_70091_1_)
+			{
+				this.motionX = 0.0D;
+			}
+
+			if (d7 != p_70091_3_)
+			{
+				this.motionY = 0.0D;
+			}
+
+			if (d8 != p_70091_5_)
+			{
+				this.motionZ = 0.0D;
+			}
+
+			d12 = this.posX - d3;
+			d10 = this.posY - d4;
+			d11 = this.posZ - d5;
+
+			try
+			{
+				this.func_145775_I();
+			}
+			catch (Throwable throwable)
+			{
+				CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Checking entity block collision");
+				CrashReportCategory crashreportcategory = crashreport.makeCategory("Entity being checked for collision");
+				this.addEntityCrashInfo(crashreportcategory);
+				throw new ReportedException(crashreport);
+			}
+
+			this.worldObj.theProfiler.endSection();
+		}
+	}
+	
+
+	public List getCollidingBoundingBoxes(Entity p_72945_1_, AxisAlignedBB p_72945_2_)
+	{
+		ArrayList collidingBoundingBoxes = new ArrayList();
+		int i = MathHelper.floor_double(p_72945_2_.minX);
+		int j = MathHelper.floor_double(p_72945_2_.maxX + 1.0D);
+		int k = MathHelper.floor_double(p_72945_2_.minY);
+		int l = MathHelper.floor_double(p_72945_2_.maxY + 1.0D);
+		int i1 = MathHelper.floor_double(p_72945_2_.minZ);
+		int j1 = MathHelper.floor_double(p_72945_2_.maxZ + 1.0D);
+
+		for (int k1 = i; k1 < j; ++k1)
+		{
+			for (int l1 = i1; l1 < j1; ++l1)
+			{
+				if (this.worldObj.blockExists(k1, 64, l1))
+				{
+					for (int i2 = k - 1; i2 < l; ++i2)
+					{
+						Block block;
+
+						if (k1 >= -30000000 && k1 < 30000000 && l1 >= -30000000 && l1 < 30000000)
+						{
+							block = this.worldObj.getBlock(k1, i2, l1);
+						}
+						else
+						{
+							block = Blocks.stone;
+						}
+
+						block.addCollisionBoxesToList(this.worldObj, k1, i2, l1, p_72945_2_, collidingBoundingBoxes, p_72945_1_);
+					}
+				}
+			}
+		}
+
+		return collidingBoundingBoxes;
 	}
 }
