@@ -350,11 +350,13 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 			case 32: // Left
 			{
 				seats[0].targetYaw -= seats[0].seatInfo.aimingSpeed.x;
+				if(seats[0].targetYaw <= -180) seats[0].targetYaw += 360;
 				return true;
 			}
 			case 33: // Right
 			{
 				seats[0].targetYaw += seats[0].seatInfo.aimingSpeed.x;
+				if(seats[0].targetYaw > 180) seats[0].targetYaw -= 360;
 				return true;
 			}
 		}
