@@ -482,8 +482,8 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 							hitLambda = hitPoint.z / motion.z;
 						if(hitLambda < 0)
 							hitLambda = -hitLambda;
-
-						hits.add(new PlayerBulletHit(new PlayerHitbox(player, new RotatedAxes(), new Vector3f(), new Vector3f(), new Vector3f(), hitPoint.y <= -0.2? EnumHitboxType.BODY: EnumHitboxType.HEAD), hitLambda));
+						
+						hits.add(new PlayerBulletHit(new PlayerHitbox(player, new RotatedAxes(), new Vector3f(), new Vector3f(), new Vector3f(), (mop.hitVec.yCoord - player.posY) <= 1.5? EnumHitboxType.BODY: EnumHitboxType.HEAD), hitLambda));
 					}
 				}
 			}
