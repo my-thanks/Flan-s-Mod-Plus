@@ -139,6 +139,7 @@ public class GuiDriveableController extends GuiScreen
 	{
 		if(mc.gameSettings.thirdPersonView == 1)
 			mc.renderViewEntity = (plane.getCamera() == null ? mc.thePlayer : plane.getCamera());
+		
 		else mc.renderViewEntity = mc.thePlayer;
 	}
 	
@@ -236,8 +237,24 @@ public class GuiDriveableController extends GuiScreen
 			if(FlansMod.proxy.keyDown(KeyInputHandler.flareKey.getKeyCode()))
 			{
 				plane.pressKey(18, player);
-			}				
-	
+			}
+
+			if(FlansMod.proxy.keyDown(Keyboard.KEY_UP))
+			{
+				plane.pressKey(30, player);
+			}
+			if(FlansMod.proxy.keyDown(Keyboard.KEY_DOWN))
+			{
+				plane.pressKey(31, player);
+			}
+			if(FlansMod.proxy.keyDown(Keyboard.KEY_LEFT))
+			{
+				plane.pressKey(32, player);
+			}
+			if(FlansMod.proxy.keyDown(Keyboard.KEY_RIGHT))
+			{
+				plane.pressKey(33, player);
+			}
 		}
 		else
 		{

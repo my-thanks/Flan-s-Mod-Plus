@@ -147,7 +147,11 @@ public class PlayerHitbox
 		{
 			player.addPotionEffect(new PotionEffect(effect));
 		}
-		float damageModifier = bullet.type.penetratingPower < 0.1F ? penetratingPower / bullet.type.penetratingPower : 1;
+		float damageModifier = 1;
+		if(penetratingPower >= 0 && bullet.type.penetratingPower > 1)
+		{
+			damageModifier = penetratingPower / bullet.type.penetratingPower;
+		}
 		switch(type)
 		{
 		case BODY : break;
