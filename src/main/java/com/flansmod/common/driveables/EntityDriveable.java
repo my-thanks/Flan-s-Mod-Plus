@@ -1997,6 +1997,8 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	//Collision mechanism mkII
 	public void moveRiders(Entity rider)
 	{
+		try
+		{
 		boolean isHuman = false;
 		boolean isDriveable = false;
 		Vector3f riderPos = new Vector3f (rider.posX, rider.posY, rider.posZ);
@@ -2135,8 +2137,11 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 				((EntityDriveable)rider).deckHeight = 0;
 			}
 		}
-		
-		
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	public void checkCollision(CollisionTest tester, CollisionShapeBox box)
