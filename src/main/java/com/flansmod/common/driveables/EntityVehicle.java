@@ -623,7 +623,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 				wheel.moveEntity(0F, (!onDeck)?-0.98F:0, 0F);	
 			}
 			
-			if((throttle >= 0.2 || throttle <= -0.2) && wheel.getSpeedXYZ() <= getAvgWheelSpeedXYZ()/4) throttle = 0;
+			if((throttle >= 0.2 || throttle <= -0.2) && wheel.getSpeedXYZ() <= getAvgWheelSpeedXYZ()/4) throttle *= 0.99;
 		}
 		
 		if(wheels[0] != null && wheels[1] != null && wheels[2] != null && wheels[3] != null)
