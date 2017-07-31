@@ -10,6 +10,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.PlayerData;
+import com.flansmod.common.PlayerHandler;
 import com.flansmod.common.guns.EnumFireMode;
 import com.flansmod.common.guns.ItemGun;
 
@@ -64,6 +66,12 @@ public class PacketGunMode extends PacketBase
 
 			if(currentMode != nextMode)
 			{
+				PlayerData data = PlayerHandler.getPlayerData(playerEntity);
+				if(data != null)
+				{
+					data.isShootingRight = data.isShootingLeft = false;
+				}
+				
 //				FlansMod.log("[Server]Switched the gun mode : " + currentMode + " -> " + nextMode);
 				
 				gun.type.setFireMode(itemStack, nextMode.ordinal());
