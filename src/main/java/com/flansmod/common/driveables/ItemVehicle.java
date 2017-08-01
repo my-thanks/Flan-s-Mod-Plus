@@ -58,7 +58,7 @@ public class ItemVehicle extends ItemMapBase implements IFlanItem
 	{
 		if(stack.stackTagCompound == null)
 		{
-			if(!world.isRemote)
+			if(!world.isRemote && stack.getItemDamage() != 0)
 				stack.stackTagCompound = getOldTagCompound(stack, world);
 			if(stack.stackTagCompound == null)
 			{
