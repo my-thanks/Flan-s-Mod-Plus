@@ -69,7 +69,16 @@ public class EntityDamageSourceGun extends EntityDamageSourceIndirect {
     	if(player.ticksExisted/20 < FlansMod.noticeSpawnKillTime){
     		System.out.println("Warning! PlayerName:"+shooter.getCommandSenderName()+" may do SPAWN KILL. Time:"+player.ticksExisted/20+" "+player.getCommandSenderName()+" was killed.");
     	}
+    	try
+    	{
+        	return new ChatComponentText(shooter.getDisplayName()+" has killed "+player.getDisplayName()+" with "+weapon.name+".");
+//        	return new ChatComponentText(shooter.getCommandSenderName()+" has killed "+player.getCommandSenderName()+" with "+weapon.name+".");
+    	}
+    	catch(Exception e)
+    	{
+            return new ChatComponentText("#flansmod");
+    	}
     	//return new ChatComponentText(shooter.getCommandSenderName()+" has killed "+player.getCommandSenderName()+" with "+weapon+". TickExisted:"+player.ticksExisted/20+" KilledPos(X:"+player.posX+" Y:"+player.posY+" Z:"+player.posZ+")"+" KillerPos(X:"+shooter.posX+" Y:"+shooter.posY+" Z:"+shooter.posZ+")");
-        return new ChatComponentText("#flansmod");//flanDeath." + weapon.shortName + "." + (killedTeam == null ? "f" : killedTeam.textColour) + player.getCommandSenderName() + "." + (killerTeam == null ? "f" : killerTeam.textColour) + shooter.getCommandSenderName());
+        //return new ChatComponentText("flansmod");//flanDeath." + weapon.shortName + "." + (killedTeam == null ? "f" : killedTeam.textColour) + player.getCommandSenderName() + "." + (killerTeam == null ? "f" : killerTeam.textColour) + shooter.getCommandSenderName());
     }
 }
