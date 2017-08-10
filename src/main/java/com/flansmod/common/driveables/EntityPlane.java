@@ -23,6 +23,7 @@ import com.flansmod.common.vector.Vector3f;
 import com.jcraft.jorbis.Block;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import io.netty.buffer.ByteBuf;
 
 public class EntityPlane extends EntityDriveable
 {
@@ -210,7 +211,7 @@ public class EntityPlane extends EntityDriveable
 			{
 				if(canThrust || throttle < 0F)
 				{
-					throttle += 0.002F;
+					throttle += 0.002F * this.accelerationUp;
 					if(throttle > 1F)
 						throttle = 1F;
 				}
@@ -220,7 +221,7 @@ public class EntityPlane extends EntityDriveable
 			{
 				if(canThrust || throttle > 0F)
 				{
-					throttle -= 0.005F;
+					throttle -= 0.005F * this.accelerationDown;
 					if(throttle < -1F)
 						throttle = -1F;
 					if(throttle < 0F && type.maxNegativeThrottle == 0F)
@@ -928,6 +929,37 @@ public class EntityPlane extends EntityDriveable
 	public boolean gearDown()
 	{
 		return varGear;
+	}
+
+	@Override
+	public void writeSpawnData(ByteBuf data)
+	{
+		super.writeSpawnData(data);
+		try
+		{
+			data.writeFloat(getPlaneType().accelerationUp);
+			data.writeFloat(getPlaneType().accelerationDown);
+		}
+		catch(Exception e)
+		{
+			data.writeFloat(1);
+			data.writeFloat(1);
+		}
+	}
+	@Override
+	public void readSpawnData(ByteBuf data)
+	{
+		super.readSpawnData(data);
+		try
+		{
+			this.accelerationUp   = data.readFloat();
+			this.accelerationDown = data.readFloat();
+		}
+		catch(Exception e)
+		{
+			this.accelerationUp   = 1;
+			this.accelerationDown = 1;
+		}
 	}
 
     public boolean attackEntityFrom(DamageSource damagesource, float i, boolean doDamage)

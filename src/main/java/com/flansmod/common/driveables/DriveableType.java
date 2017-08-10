@@ -42,6 +42,9 @@ public class DriveableType extends InfoType
 	private float maxCollisionX = 1, maxCollisionY = 1, maxCollisionZ = 1;
 	private float collisionWidth = 0, collisionHeight = 0;
 
+	public float accelerationUp   = 1;
+	public float accelerationDown = 1;
+
 	//Ammo
 	/** If true, then all ammo is accepted. Default is true to minimise backwards compatibility issues */
 	public boolean acceptAllAmmo = true;
@@ -302,6 +305,11 @@ public class DriveableType extends InfoType
 			else if(split[0].equals("FallDamageFactor"))
 				fallDamageFactor = Float.parseFloat(split[1]);
 
+			else if(split[0].equals("Acceleration"))
+			{
+				accelerationUp   = split.length ==2? Float.parseFloat(split[1]): Float.parseFloat(split[1]);
+				accelerationDown = split.length ==2? Float.parseFloat(split[1]): Float.parseFloat(split[2]);
+			}
 			//Movement Variables
 			else if(split[0].equals("MaxThrottle"))
 				maxThrottle = Float.parseFloat(split[1]);

@@ -121,9 +121,34 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 	}
 
 	@Override
+	public void writeSpawnData(ByteBuf data)
+	{
+		super.writeSpawnData(data);
+		try
+		{
+			data.writeFloat(getVehicleType().accelerationUp);
+			data.writeFloat(getVehicleType().accelerationDown);
+		}
+		catch(Exception e)
+		{
+			data.writeFloat(1);
+			data.writeFloat(1);
+		}
+	}
+	@Override
 	public void readSpawnData(ByteBuf data)
 	{
 		super.readSpawnData(data);
+		try
+		{
+			this.accelerationUp   = data.readFloat();
+			this.accelerationDown = data.readFloat();
+		}
+		catch(Exception e)
+		{
+			this.accelerationUp   = 1;
+			this.accelerationDown = 1;
+		}
 	}
 
 	@Override
@@ -208,14 +233,14 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 		{
 			case 0 : //Accelerate : Increase the throttle, up to 1.
 			{
-				throttle += 0.01F;
+				throttle += 0.01F * this.accelerationUp;
 				if(throttle > 1F)
 					throttle = 1F;
 				return true;
 			}
 			case 1 : //Decelerate : Decrease the throttle, down to -1, or 0 if the vehicle cannot reverse
 			{
-				throttle -= 0.01F;
+				throttle -= 0.01F * this.accelerationDown;
 				if(throttle < -1F)
 					throttle = -1F;
 				if(throttle < 0F && type.maxNegativeThrottle == 0F)
@@ -623,7 +648,7 @@ public class EntityVehicle extends EntityDriveable implements IExplodeable
 				wheel.moveEntity(0F, (!onDeck)?-0.98F:0, 0F);	
 			}
 			
-			if((throttle >= 0.2 || throttle <= -0.2) && wheel.getSpeedXYZ() <= getAvgWheelSpeedXYZ()/4) throttle *= 0.99;
+			if((throttle >= 0.2 || throttle <= -0.2) && wheel.getSpeedXYZ() <= getAvgWheelSpeedXYZ()/4 && wheel.isCollidedVertically) throttle = 0;
 		}
 		
 		if(wheels[0] != null && wheels[1] != null && wheels[2] != null && wheels[3] != null)

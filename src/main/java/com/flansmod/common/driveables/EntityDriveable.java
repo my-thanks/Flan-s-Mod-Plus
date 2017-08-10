@@ -194,7 +194,9 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	
 	public boolean toDeactivate = false;
 	public int timeTillDeactivate = 0;
-	
+
+	public float accelerationUp   = 0.1f;
+	public float accelerationDown = 0.1f;
 	
 	@SideOnly(Side.CLIENT)
 	public EntityLivingBase camera;
