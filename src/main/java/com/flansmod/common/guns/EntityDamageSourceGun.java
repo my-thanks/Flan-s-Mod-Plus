@@ -3,8 +3,10 @@ package com.flansmod.common.guns;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EntityDamageSourceIndirect;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 
 import com.flansmod.common.FlansMod;
@@ -71,7 +73,10 @@ public class EntityDamageSourceGun extends EntityDamageSourceIndirect {
     	}
     	try
     	{
-        	return new ChatComponentText(shooter.getDisplayName()+" has killed "+player.getDisplayName()+" with "+weapon.name+".");
+			String msg = headshot ? "has " + EnumChatFormatting.DARK_RED + "headshot" + EnumChatFormatting.RESET + " by" : "has killed";
+			String shooterName = ScorePlayerTeam.formatPlayerName(shooter.getTeam(), shooter.getDisplayName());
+			String playerName  = ScorePlayerTeam.formatPlayerName(player.getTeam(),  player.getDisplayName());
+			return new ChatComponentText(shooterName + " " + msg + " " + playerName + " with " + weapon.name + ".");
 //        	return new ChatComponentText(shooter.getCommandSenderName()+" has killed "+player.getCommandSenderName()+" with "+weapon.name+".");
     	}
     	catch(Exception e)
