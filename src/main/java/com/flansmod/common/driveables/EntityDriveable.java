@@ -1050,6 +1050,8 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
     public void onUpdate()
     {
         super.onUpdate();
+        
+		getEntityData().setBoolean("FlareUsing", this.ticksFlareUsing > 0);
 
         DriveableType type = getDriveableType();
         DriveableData data = getDriveableData();
