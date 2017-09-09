@@ -73,7 +73,7 @@ public class EntityDamageSourceGun extends EntityDamageSourceIndirect {
     	}
     	try
     	{
-			String msg = headshot ? "has " + EnumChatFormatting.DARK_RED + "headshot" + EnumChatFormatting.RESET + " by" : "has killed";
+			String msg = headshot ? "has " + EnumChatFormatting.DARK_RED + "headshot" + EnumChatFormatting.RESET : "has killed";
 			String shooterName = ScorePlayerTeam.formatPlayerName(shooter.getTeam(), shooter.getDisplayName());
 			String playerName  = ScorePlayerTeam.formatPlayerName(player.getTeam(),  player.getDisplayName());
 			return new ChatComponentText(shooterName + " " + msg + " " + playerName + " with " + weapon.name + ".");
