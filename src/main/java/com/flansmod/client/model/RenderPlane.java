@@ -2,6 +2,16 @@ package com.flansmod.client.model;
 
 import org.lwjgl.opengl.GL11;
 
+import com.flansmod.client.FlansModResourceHandler;
+import com.flansmod.common.FlansMod;
+import com.flansmod.common.driveables.DriveablePart;
+import com.flansmod.common.driveables.EntityPlane;
+import com.flansmod.common.driveables.ItemPlane;
+import com.flansmod.common.driveables.PlaneType;
+import com.flansmod.common.driveables.Propeller;
+import com.flansmod.common.driveables.ShootPoint;
+import com.flansmod.common.vector.Vector3f;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
@@ -10,17 +20,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IItemRenderer;
-
-import com.flansmod.client.FlansModResourceHandler;
-import com.flansmod.common.FlansMod;
-import com.flansmod.common.driveables.DriveablePart;
-import com.flansmod.common.driveables.DriveablePosition;
-import com.flansmod.common.driveables.ShootPoint;
-import com.flansmod.common.driveables.EntityPlane;
-import com.flansmod.common.driveables.ItemPlane;
-import com.flansmod.common.driveables.PlaneType;
-import com.flansmod.common.driveables.Propeller;
-import com.flansmod.common.vector.Vector3f;
 
 public class RenderPlane extends Render implements IItemRenderer 
 {	
@@ -85,7 +84,7 @@ public class RenderPlane extends Render implements IItemRenderer
 			{
 				GL11.glPushMatrix();
 				GL11.glTranslatef(model.heliTailRotorOrigins[i].x, model.heliTailRotorOrigins[i].y, model.heliTailRotorOrigins[i].z);
-			    GL11.glRotatef((entityPlane.rotorAngle + f1 * entityPlane.throttle / 7F) * 1440F / 3.14159265F, 0.0F, 0.0F, 1.0F);
+			    GL11.glRotatef((entityPlane.rotorAngle + f1 * entityPlane.throttle / 7F) * model.heliTailRotorSpeeds[i] * 1440F / 3.14159265F, 0.0F, 0.0F, 1.0F);
 				GL11.glTranslatef(-model.heliTailRotorOrigins[i].x, -model.heliTailRotorOrigins[i].y, -model.heliTailRotorOrigins[i].z);
 				model.renderTailRotor(entityPlane, 0.0625F, i);
 				GL11.glPopMatrix();
