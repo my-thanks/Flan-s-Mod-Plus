@@ -1,23 +1,6 @@
 package com.flansmod.common.driveables;
 
-import io.netty.buffer.ByteBuf;
-
 import java.util.List;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EntityBodyHelper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.item.ItemLead;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
 
 import com.flansmod.api.IControllable;
 import com.flansmod.client.FlansModClient;
@@ -40,6 +23,19 @@ import com.flansmod.common.vector.Vector3f;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemLead;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 
 public class EntitySeat extends Entity implements IControllable, IEntityAdditionalSpawnData
 {
@@ -823,7 +819,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	@Override
 	public float getCameraDistance()
 	{
-		return foundDriveable && seatID == 0 ? driveable.getDriveableType().cameraDistance : 5F;
+		return foundDriveable && seatID == 0 ? driveable.getDriveableType().cameraDistance : driveable.getDriveableType().passengerCameraDistance;
 	}
 
 	@Override

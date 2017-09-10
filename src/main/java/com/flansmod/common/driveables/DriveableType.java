@@ -4,26 +4,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import net.minecraft.block.material.Material;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemDye;
-import net.minecraft.item.ItemStack;
-
 import com.flansmod.client.model.ModelDriveable;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.driveables.collisions.CollisionShapeBox;
 import com.flansmod.common.guns.BulletType;
 import com.flansmod.common.guns.EnumFireMode;
-import com.flansmod.common.guns.GunType;
 import com.flansmod.common.parts.PartType;
 import com.flansmod.common.types.InfoType;
 import com.flansmod.common.types.TypeFile;
 import com.flansmod.common.vector.Vector3f;
-import com.flansmod.common.driveables.ShootPoint;
-import com.flansmod.common.driveables.collisions.CollisionShapeBox;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.material.Material;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemDye;
+import net.minecraft.item.ItemStack;
 
 public class DriveableType extends InfoType
 {
@@ -119,6 +116,7 @@ public class DriveableType extends InfoType
 	public float yOffset = 10F / 16F;
 	/** Third person render distance */
 	public float cameraDistance = 5F;
+	public float passengerCameraDistance = 5F;
 	
 	//Particle system
 	/** A list of ambient particle emitters on this vehicle */
@@ -761,6 +759,8 @@ public class DriveableType extends InfoType
             //Third person camera distance
 			else if(split[0].equals("CameraDistance"))
 				cameraDistance = Float.parseFloat(split[1]);
+			else if(split[0].equals("PassengerCameraDistance"))
+				passengerCameraDistance = Float.parseFloat(split[1]);
 
 			//Sound
 			else if(split[0].equals("StartSoundRange"))
