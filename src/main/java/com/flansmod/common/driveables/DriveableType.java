@@ -162,6 +162,9 @@ public class DriveableType extends InfoType
     
 	/**Track animation frames */
 	public int animFrames = 2;
+	
+	/**Camera Stuff*/
+	public Vector3f cameraPos = new Vector3f(0,0,0);
 
 	/** Sounds */
 	public int startSoundRange = 50;
@@ -351,6 +354,9 @@ public class DriveableType extends InfoType
 				lockedOnSoundRange = Integer.parseInt(split[1]);
 			else if(split[0].equals("CanRoll"))
 				canRoll = Boolean.parseBoolean(split[1]);
+			
+			if(split[0].equals("CameraPosition"))
+				cameraPos = new Vector3f(Float.parseFloat(split[1]),Float.parseFloat(split[2]),Float.parseFloat(split[3]));
 			
 			//Flares
 			if(split[0].equals("HasFlare"))

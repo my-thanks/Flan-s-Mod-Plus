@@ -1,8 +1,8 @@
 package com.flansmod.client;
 
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
-import com.flansmod.common.guns.EntityBullet;
 import com.flansmod.common.vector.Vector3f;
 
 import net.minecraft.entity.Entity;
@@ -35,8 +35,10 @@ public class EntityCamera extends EntityLivingBase
 		prevPosX = posX;
 		prevPosY = posY;
 		prevPosZ = posZ;
+		
+		DriveableType type = driveable.getDriveableType();
 
-		Vector3f cameraPosition = new Vector3f();//-1F, 0.5F, 0F);
+		Vector3f cameraPosition = type != null ? type.cameraPos: new Vector3f();
 		//cameraPosition.scale(driveable.getDriveableType().cameraDistance);
 		cameraPosition = driveable.axes.findLocalVectorGlobally(cameraPosition);
 		
