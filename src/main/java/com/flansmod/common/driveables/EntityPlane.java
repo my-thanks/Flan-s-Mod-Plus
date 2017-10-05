@@ -556,14 +556,14 @@ public class EntityPlane extends EntityDriveable
 
 		//Movement
 
-		boolean canThrust = (seats[0] != null && seats[0].riddenByEntity instanceof EntityPlayer && ((EntityPlayer)seats[0].riddenByEntity).capabilities.isCreativeMode) || data.fuelInTank > 0;
+		boolean canThrust = seats[0] != null && seats[0].riddenByEntity instanceof EntityPlayer && ((EntityPlayer)seats[0].riddenByEntity).capabilities.isCreativeMode) || data.fuelInTank > 0;
 
 		//Throttle handling
 		//Without a player, default to 0
 		//With a player default to 0.5 for helicopters (hover speed)
 		//And default to the range 0.25 ~ 0.5 for planes (taxi speed ~ take off speed)
 		float throttlePull = 0.99F;
-		if(passControl.getPassengerFromList(0) != null || (seats[0] != null && seats[0].riddenByEntity != null && mode == EnumPlaneMode.HELI && canThrust))
+		if(seats[0] != null && seats[0].riddenByEntity != null && canThrust && mode == EnumPlaneMode.HELI)
 			throttle = (throttle - 0.5F) * throttlePull + 0.5F;
 
 		//Get the speed of the plane
@@ -619,7 +619,7 @@ public class EntityPlane extends EntityDriveable
 
 		float throttleScaled = 0.01F * (type.maxThrottle + (data.engine == null ? 0 : data.engine.engineSpeed));
 
-		if(!canThrust || passControl.getPassengerFromList(0) == null)
+		if(!canThrust)
 			throttleScaled = 0;
 
 		int numPropsWorking = 0;
