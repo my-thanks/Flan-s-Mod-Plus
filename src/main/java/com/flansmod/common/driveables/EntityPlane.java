@@ -556,7 +556,7 @@ public class EntityPlane extends EntityDriveable
 
 		//Movement
 
-		boolean canThrust = seats[0] != null && seats[0].riddenByEntity instanceof EntityPlayer && ((EntityPlayer)seats[0].riddenByEntity).capabilities.isCreativeMode) || data.fuelInTank > 0;
+		boolean canThrust = (seats[0] != null && seats[0].riddenByEntity instanceof EntityPlayer && ((EntityPlayer)seats[0].riddenByEntity).capabilities.isCreativeMode) || data.fuelInTank > 0;
 
 		//Throttle handling
 		//Without a player, default to 0
