@@ -254,7 +254,10 @@ public class EntityPlane extends EntityDriveable
 			case 6 : //Exit : Get out
 			{
 				if(seats[0].riddenByEntity != null)
+				{
 					seats[0].riddenByEntity.mountEntity(null);
+					passControl.removePassengerFromList(0);
+				}
           		return true;
 			}
 			case 7 : //Inventory : Check to see if this plane allows in-flight inventory editing or if the plane is on the ground
@@ -560,7 +563,7 @@ public class EntityPlane extends EntityDriveable
 		//With a player default to 0.5 for helicopters (hover speed)
 		//And default to the range 0.25 ~ 0.5 for planes (taxi speed ~ take off speed)
 		float throttlePull = 0.99F;
-		if(seats[0] != null && seats[0].riddenByEntity != null && mode == EnumPlaneMode.HELI && canThrust)
+		if(passControl.getPassengerFromList(0) != null || (seats[0] != null && seats[0].riddenByEntity != null && mode == EnumPlaneMode.HELI && canThrust))
 			throttle = (throttle - 0.5F) * throttlePull + 0.5F;
 
 		//Get the speed of the plane
@@ -616,7 +619,7 @@ public class EntityPlane extends EntityDriveable
 
 		float throttleScaled = 0.01F * (type.maxThrottle + (data.engine == null ? 0 : data.engine.engineSpeed));
 
-		if(!canThrust)
+		if(!canThrust || passControl.getPassengerFromList(0) == null)
 			throttleScaled = 0;
 
 		int numPropsWorking = 0;
@@ -689,12 +692,13 @@ public class EntityPlane extends EntityDriveable
 
 			//Apply forces
 			Vector3f forwards = (Vector3f)axes.getXAxis().normalise();
-
+			
 			//Sanity limiter
 			if(lastTickSpeed > 2F)
 				lastTickSpeed = 2F;
-
-			float newSpeed = lastTickSpeed + throttleScaled * 2F;
+			
+			//float newSpeed = lastTickSpeed + throttleScaled * 2F;
+			float newSpeed = lastTickSpeed + throttleScaled * numPropsWorking / numProps * 2F;
 
 			//Calculate the amount to alter motion by
 			float proportionOfMotionToCorrect = 2F * throttle - 0.5F;
@@ -753,7 +757,7 @@ public class EntityPlane extends EntityDriveable
 		default:
 			break;
 		}
-
+		
 		double motion = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
 		if(motion > 10)
 		{
@@ -761,7 +765,7 @@ public class EntityPlane extends EntityDriveable
 			motionY *= 10 / motion;
 			motionZ *= 10 / motion;
 		}
-
+		
 		for(EntityWheel wheel : wheels)
 		{
 			if(wheel != null && worldObj != null)

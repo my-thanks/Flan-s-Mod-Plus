@@ -3,6 +3,8 @@ package com.flansmod.common.driveables;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Iterator;
 
 import mapwriter.forge.MwForge;
 import net.minecraft.block.Block;
@@ -27,6 +29,10 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import cofh.api.energy.IEnergyContainerItem;
 
+import net.minecraftforge.common.ForgeChunkManager;
+import net.minecraftforge.common.ForgeChunkManager.Ticket;
+import net.minecraft.world.ChunkCoordIntPair;
+
 import com.flansmod.api.IControllable;
 import com.flansmod.api.IExplodeable;
 import com.flansmod.client.EntityCamera;
@@ -41,6 +47,9 @@ import com.flansmod.common.driveables.collisions.CollisionShapeBox;
 import com.flansmod.common.driveables.collisions.CollisionTest;
 import com.flansmod.common.driveables.collisions.RidingEntityPosition;
 import com.flansmod.common.driveables.mechas.EntityMecha;
+import com.flansmod.common.driveables.PassengerController;
+import com.flansmod.common.teams.ChunkLoadingHandler;
+
 import com.flansmod.common.guns.EntityBullet;
 import com.flansmod.common.guns.EntityDamageSourceGun;
 import com.flansmod.common.guns.EntityShootable;
@@ -206,7 +215,12 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	private ItemStack[][] prevInventoryItems = new ItemStack[][]{ null, null };
 
 	public Entity lastAtkEntity = null;
-
+	
+	/** There is passenger's life :) */
+	public PassengerController passControl;
+	private List chunksForLoad = new ArrayList();
+	private int chunkChunkTickTick = 20;
+	
     public EntityDriveable(World world)
     {
         super(world);
@@ -219,6 +233,8 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		renderDistanceWeight = 200D;
 		key = "ChangeMe";
 		locked = false;
+		/** There is passenger's life :) */
+		passControl = new PassengerController();
     }
 
 
@@ -232,15 +248,21 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 	protected void initType(DriveableType type, boolean clientSide)
 	{
 		setSize(type.getWidth(), type.getHeight());
-
+		
+		/** There is passenger's life :) */
+		passControl.setPassengerListCapasity(type.numPassengers + 1);
+		
 		seats = new EntitySeat[type.numPassengers + 1];
 		for(int i = 0; i < type.numPassengers + 1; i++)
 		{
+			
 			if(!clientSide)
 			{
 				seats[i] = new EntitySeat(worldObj, this, i);
 				worldObj.spawnEntityInWorld(seats[i]);
 			}
+			/** There is passenger's life :) */
+			passControl.setHardPassengerToList(null);
 		}
 		wheels = new EntityWheel[type.wheelPositions.length];
 		for(int i = 0; i < wheels.length; i++)
@@ -288,6 +310,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 				}
 			}
 		}
+		
 	}
 
 	@Override
@@ -498,6 +521,7 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		for(EntitySeat seat : seats)
 			if(seat != null)
 				seat.setDead();
+		passControl.clearPassengersList();
 	}
 
 	@Override
@@ -1050,6 +1074,56 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
     public void onUpdate()
     {
         super.onUpdate();
+		
+		/** There is passenger's life :) */
+		if (chunkChunkTickTick > 0)
+			--chunkChunkTickTick;
+		
+		if (passControl.getPassengerFromList(0) != null)
+		{
+			if(chunkChunkTickTick <= 0)
+			{
+				chunkChunkTickTick = 20;	
+				Ticket ticket = ChunkLoadingHandler.INSTANCE.getTicket(this);
+				if(ticket != null)
+				{                          
+					double xChunkForLoad = posX / 16.0D;
+					double zChunkForLoad = posZ / 16.0D;
+					ArrayList list = new ArrayList();
+					list.add(new ChunkCoordIntPair(MathHelper.floor_double(xChunkForLoad), MathHelper.floor_double(zChunkForLoad)));
+					//list.add(new ChunkCoordIntPair(MathHelper.ceiling_double_int(xChunkForLoad), MathHelper.ceiling_double_int(zChunkForLoad)));
+					//list.add(new ChunkCoordIntPair(MathHelper.floor_double(xChunkForLoad), MathHelper.ceiling_double_int(zChunkForLoad)));
+					//list.add(new ChunkCoordIntPair(MathHelper.ceiling_double_int(xChunkForLoad), MathHelper.floor_double(zChunkForLoad)));
+					Iterator var8 = list.iterator();
+					ChunkCoordIntPair chunkChunk;
+					while(var8.hasNext())
+					{
+						chunkChunk = (ChunkCoordIntPair)var8.next();
+						if(!chunksForLoad.contains(chunkChunk))
+						{
+							ForgeChunkManager.forceChunk(ticket, chunkChunk);
+						} else
+						{
+							chunksForLoad.remove(chunkChunk);
+						}
+					}
+
+					var8 = chunksForLoad.iterator();
+					while(var8.hasNext())
+					{
+						chunkChunk = (ChunkCoordIntPair)var8.next();
+						ForgeChunkManager.unforceChunk(ticket, chunkChunk);
+					}
+
+					chunksForLoad = list;
+				}
+			}   
+		} else
+		{
+			this.chunksForLoad.clear();
+		}			
+			
+		
         
 		getEntityData().setBoolean("FlareUsing", this.ticksFlareUsing > 0);
 
@@ -1215,14 +1289,31 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		}
 
         if(!worldObj.isRemote)
-        {
-        	for(int i = 0; i < getDriveableType().numPassengers + 1; i++)
-        	{
-        		if(seats[i] == null || !seats[i].addedToChunk)
+        {	
+			boolean mySeatIsLost;
+			for(int i = 0; i < getDriveableType().numPassengers + 1; i++)
+        	{       		 
+				mySeatIsLost = false;
+				if(seats[i] != null)
+					mySeatIsLost = isMySeatHere(seats[i]);				
+				if(mySeatIsLost || seats[i] == null || !seats[i].addedToChunk)
         		{
-        			seats[i] = new EntitySeat(worldObj, this, i);
+        			/** Try to save passenger's life :) */
+					Entity passenger = passControl.getPassengerFromList(i);
+					if (passenger != null)
+						passenger.mountEntity(null);						
+					if (passenger instanceof EntityPlayer)
+					{
+						EntityPlayerMP playerInDiveable = (EntityPlayerMP) passenger;
+						playerInDiveable.setPositionAndUpdate(posX, posY, posZ);						
+					}	
+					if (seats[i] != null)
+						seats[i].setDead();
+					seats[i] = new EntitySeat(worldObj, this, i);
     				worldObj.spawnEntityInWorld(seats[i]);
-        		}
+					if (seats[i] != null && passenger != null)
+						passenger.mountEntity(seats[i]);
+				}
         	}
         	for(int i = 0; i < type.wheelPositions.length; i++)
         	{
@@ -2979,6 +3070,23 @@ public abstract class EntityDriveable extends Entity implements IControllable, I
 		player.addChatMessage(new ChatComponentText("Unlocked"));
 		}
 	}
-
+	
+	public boolean isMySeatHere(EntitySeat seat)
+	{
+						
+		double localSeatPositionCalcX = Math.abs(posX) - Math.abs(seat.posX);
+		double localSeatPositionCalcY = Math.abs(posY) - Math.abs(seat.posY);
+		double localSeatPositionCalcZ = Math.abs(posZ) - Math.abs(seat.posZ);
+		
+		double seatBackgroundPositionCalc = Math.sqrt(localSeatPositionCalcX * localSeatPositionCalcX + localSeatPositionCalcY * localSeatPositionCalcY + localSeatPositionCalcZ * localSeatPositionCalcZ);
+		
+		double localSeatCalculationX = seat.seatInfo.x / 16F;
+		double localSeatCalculationY = seat.seatInfo.y / 16F;
+		double localSeatCalculationZ = seat.seatInfo.z / 16F;
+		
+		double seatBackgroundCalculation = Math.sqrt(localSeatCalculationX * localSeatCalculationX + localSeatCalculationY * localSeatCalculationY + localSeatCalculationZ * localSeatCalculationZ);
+		
+		return Math.abs(seatBackgroundPositionCalc - seatBackgroundCalculation) > 32D;
+	}
 
 }

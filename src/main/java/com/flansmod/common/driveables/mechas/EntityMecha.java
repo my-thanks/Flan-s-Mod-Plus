@@ -34,6 +34,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import com.flansmod.client.debug.EntityDebugVector;
 import com.flansmod.client.gui.GuiDriveableController;
 import com.flansmod.client.model.GunAnimations;
+import com.flansmod.client.model.ModelDriveable;
 import com.flansmod.common.FlansMod;
 import com.flansmod.common.RotatedAxes;
 import com.flansmod.common.driveables.DriveableData;
@@ -131,11 +132,10 @@ public class EntityMecha extends EntityDriveable
 	
 	public int stompDelay;
 	
-    /** Gun animations */
-    public GunAnimations leftAnimations = new GunAnimations(), rightAnimations = new GunAnimations();
 	boolean couldNotFindFuel;
-    
-
+	
+	//Speed of minigun's barrels rotation
+	public float minigunLeftSpeed = 0F, minigunRightSpeed = 0F;
 
 	public EntityMecha(World world) 
 	{
@@ -352,7 +352,7 @@ public class EntityMecha extends EntityDriveable
 	private boolean useItem(boolean left)
 	{
         if(left? isPartIntact(EnumDriveablePart.leftArm) : isPartIntact(EnumDriveablePart.rightArm))
-	        {
+	    {
 			boolean creative = !(seats[0].riddenByEntity instanceof EntityPlayer) || ((EntityPlayer) seats[0].riddenByEntity).capabilities.isCreativeMode;
 			ItemStack heldStack = left ? inventory.getStackInSlot(EnumMechaSlotType.leftTool) : inventory.getStackInSlot(EnumMechaSlotType.rightTool);
 			if(heldStack == null)
@@ -393,14 +393,22 @@ public class EntityMecha extends EntityDriveable
 			{
 				ItemGun gunItem = (ItemGun)heldItem;
 				GunType gunType = gunItem.type;
+				MechaType type = this.getMechaType();
+				ModelDriveable mechaModel = type.model;
+				GunAnimations currentAnimation = null;
+				boolean canShootGunMode = true;
 				
+				//Get the correct animation
+				if (mechaModel != null)	
+					currentAnimation = left ? mechaModel.leftAnimations : mechaModel.rightAnimations;				
+								
 				//Get the correct shoot delay
 				int delay = left ? shootDelayLeft : shootDelayRight;
 				
 				//If we can shoot
 				if(delay <= 0)
 				{
-					//Go through the bullet stacks in the gun and see if any of them are not null
+					//Go through the bullet stacks in the gun and see if any of them are not null					
 					int bulletID = 0;
 					ItemStack bulletStack = null;
 					for(; bulletID < gunType.numAmmoItemsInGun; bulletID++)
@@ -412,38 +420,54 @@ public class EntityMecha extends EntityDriveable
 							break;
 						}
 					}
-
+					
 					//If no bullet stack was found, reload
 					if(bulletStack == null)
 					{
 						gunItem.reload(heldStack, gunType, worldObj, this, driveableData, (infiniteAmmo() || creative), false);
 					}
+					
 					//A bullet stack was found, so try shooting with it
 					else if(bulletStack.getItem() instanceof ItemBullet)
-					{
-						//Shoot
-						shoot(heldStack, gunType, bulletStack, creative, left);
-						
+					{						
 						//Apply animations to 3D modelled guns
-						//TODO : Move to client side and sync
-						if(worldObj.isRemote)
+						if(!worldObj.isRemote)
 						{
 							int pumpDelay = gunType.model == null ? 0 : gunType.model.pumpDelay;
 							int pumpTime = gunType.model == null ? 1 : gunType.model.pumpTime;
+							
+							if (currentAnimation != null)
+							{
+								currentAnimation.doShoot(pumpDelay, pumpTime);
+								currentAnimation.minigunBarrelRotationSpeed = left ? minigunLeftSpeed : minigunRightSpeed;
+							}
+						}
+						
+						//If gun type of minigun, check it's rotation speed for shoot
+						if (gunType.mode == EnumFireMode.MINIGUN )
+						{	
 							if(left)
 							{
-								leftAnimations.doShoot(pumpDelay, pumpTime);
+								minigunLeftSpeed += 2F;
+								if (minigunLeftSpeed < gunType.minigunStartSpeed)
+									canShootGunMode = false;
 							}
 							else
 							{
-								rightAnimations.doShoot(pumpDelay, pumpTime);
+								minigunRightSpeed += 2F;
+								if (minigunRightSpeed < gunType.minigunStartSpeed)
+									canShootGunMode = false;
 							}
 						}
-						//Damage the bullet item
-						bulletStack.setItemDamage(bulletStack.getItemDamage() + 1);
-						
-						//Update the stack in the gun
-						gunItem.setBulletItemStack(heldStack, bulletStack, bulletID);
+						//Shoot								
+						if (canShootGunMode)
+						{
+							shoot(heldStack, gunType, bulletStack, creative, left);
+							//Damage the bullet item
+							bulletStack.setItemDamage(bulletStack.getItemDamage() + 1);						
+							//Update the stack in the gun
+							gunItem.setBulletItemStack(heldStack, bulletStack, bulletID);
+						}										
 					}
 				}
 			}
@@ -574,6 +598,9 @@ public class EntityMecha extends EntityDriveable
 		super.onUpdate();
 		
 		boolean legDir = true;
+		
+		minigunLeftSpeed *= 0.9F;
+		minigunRightSpeed *= 0.9F;
 
 		if(legPosition > 1){
 			legPosition = 0;
@@ -690,8 +717,8 @@ public class EntityMecha extends EntityDriveable
 			rightMouseHeld = leftMouseHeld = false;
 		
 		//Update gun animations
-		leftAnimations.update();
-		rightAnimations.update();
+		//leftAnimations.update();
+		//rightAnimations.update();
 		
 		//Get Mecha Type
 		MechaType type = this.getMechaType();
