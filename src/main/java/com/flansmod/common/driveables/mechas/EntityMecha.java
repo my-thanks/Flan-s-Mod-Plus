@@ -395,13 +395,22 @@ public class EntityMecha extends EntityDriveable
 				GunType gunType = gunItem.type;
 				MechaType type = this.getMechaType();
 				ModelDriveable mechaModel = type.model;
-				GunAnimations currentAnimation = null;
+				GunAnimations currentAnimation = new GunAnimations();
 				boolean canShootGunMode = true;
 				
 				//Get the correct animation
-				if (mechaModel != null)	
-					currentAnimation = left ? mechaModel.leftAnimations : mechaModel.rightAnimations;				
-								
+				if (mechaModel != null)
+				{
+					if (left && mechaModel.leftAnimations.containsKey((EntityDriveable)this))
+						currentAnimation = mechaModel.leftAnimations.get((EntityDriveable)this);
+							else 
+								mechaModel.leftAnimations.put((EntityDriveable)this, currentAnimation);
+					
+					if (!left && mechaModel.rightAnimations.containsKey((EntityDriveable)this))
+						currentAnimation = mechaModel.rightAnimations.get((EntityDriveable)this);
+							else 
+								mechaModel.rightAnimations.put((EntityDriveable)this, currentAnimation);
+				}			
 				//Get the correct shoot delay
 				int delay = left ? shootDelayLeft : shootDelayRight;
 				
