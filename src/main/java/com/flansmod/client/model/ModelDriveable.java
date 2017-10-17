@@ -27,8 +27,7 @@ public class ModelDriveable extends ModelBase
 	/** Set to true to use the old rotation order (ZYX) rather than (YZX) */
 	public boolean oldRotateOrder = false;
 	/** Gun animations fo mecha*/
-	public GunAnimations leftAnimations = new GunAnimations();
-	public GunAnimations rightAnimations = new GunAnimations();
+	public HashMap<EntityDriveable, GunAnimations> leftAnimations = new HashMap<EntityDriveable, GunAnimations>(), rightAnimations = new HashMap<EntityDriveable, GunAnimations>();
 	
 	/** For rendering a specific entity */
 	public void render(EntityDriveable driveable, float f1)

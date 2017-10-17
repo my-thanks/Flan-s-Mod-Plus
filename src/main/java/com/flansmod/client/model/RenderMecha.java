@@ -21,7 +21,9 @@ import net.minecraftforge.client.IItemRenderer.ItemRendererHelper;
 
 import com.flansmod.client.ClientProxy;
 import com.flansmod.client.FlansModResourceHandler;
+import com.flansmod.client.model.GunAnimations;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.DriveablePosition;
 import com.flansmod.common.driveables.ShootPoint;
@@ -397,14 +399,21 @@ public class RenderMecha extends Render implements IItemRenderer
 		
 		//Update gun animations
 		MechaType animationType = mecha.getMechaType();
-		ModelDriveable animaionModel = (ModelDriveable)animationType.model;			
-		if(animaionModel != null)
-		{
-			if(leftHand)
-				animaionModel.leftAnimations.update(); 
-				else
-					animaionModel.rightAnimations.update();
-		}
+		ModelDriveable animationModel = (ModelDriveable)animationType.model;
+		GunAnimations animationGun = new GunAnimations();
+		
+		if(animationModel != null)
+			if(leftHand && animationModel.rightAnimations.containsKey((EntityDriveable)mecha))
+			{
+				animationGun = animationModel.leftAnimations.get((EntityDriveable)mecha);
+				animationGun.update();
+			}
+			else if(!leftHand && animationModel.rightAnimations.containsKey((EntityDriveable)mecha))
+			{
+				animationGun = animationModel.rightAnimations.get((EntityDriveable)mecha);
+				animationGun.update();
+			}
+		
 				
 		//Render tools
 		if(item instanceof ItemMechaAddon)
@@ -439,7 +448,7 @@ public class RenderMecha extends Render implements IItemRenderer
 			GL11.glPushMatrix();
 			GL11.glRotatef(-90F, 0F, 0F, 1F);
 			texturemanager.bindTexture(FlansModResourceHandler.getTexture(gunType));
-			ClientProxy.gunRenderer.renderGun(stack, gunType, 1F / 16F, model, leftHand ? animaionModel.leftAnimations : animaionModel.rightAnimations, 0F);
+			ClientProxy.gunRenderer.renderGun(stack, gunType, 1F / 16F, model, animationGun, 0F);
 			GL11.glPopMatrix();
 		}
 		else
