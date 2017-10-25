@@ -4,6 +4,9 @@ import org.lwjgl.opengl.GL11;
 
 import com.flansmod.client.tmt.ModelRendererTurbo;
 import com.flansmod.common.teams.ArmourType;
+import com.flansmod.common.FlansMod;
+import com.flansmod.client.model.ModelCustomArmourSmartRenderer;
+import com.flansmod.client.model.ModelCNPCsRenderer;
 
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelRenderer;
@@ -33,9 +36,7 @@ public class ModelCustomArmour extends ModelBiped
 		int srcBlend = GL11.glGetInteger(GL11.GL_BLEND_SRC);
 		int dstBlend = GL11.glGetInteger(GL11.GL_BLEND_DST);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-		GL11.glPushMatrix();
-		GL11.glScalef(type.modelScale, type.modelScale, type.modelScale);
+		
 		isSneak = entity.isSneaking();
 		ItemStack itemstack = ((EntityLivingBase)entity).getEquipmentInSlot(0);
         heldItemRight = itemstack != null ? 1 : 0;
@@ -53,6 +54,24 @@ public class ModelCustomArmour extends ModelBiped
                 aimedBow = true;
             }
         }
+		
+		if (FlansMod.isSmartMovingHere)
+		{	
+			boolean smartRenderTryToDo = ModelCustomArmourSmartRenderer.renderArmourSmart(entity, f5, type);
+			if (smartRenderTryToDo)
+				return;
+		}
+		/*
+		if (FlansMod.isCustomNPCsHere)
+		{		
+			boolean cNPCsRenderTryToDo = ModelCNPCsRenderer.renderCNPsArmour(entity, this, type, f5);	
+			if (cNPCsRenderTryToDo)
+			return;
+		}
+		*/
+		GL11.glPushMatrix();	
+		GL11.glScalef(type.modelScale, type.modelScale, type.modelScale);
+		
 		setRotationAngles(f, f1, f2, f3, f4, f5, entity); 
 		render(headModel, bipedHead, f5, type.modelScale);
 		render(bodyModel, bipedBody, f5, type.modelScale);
