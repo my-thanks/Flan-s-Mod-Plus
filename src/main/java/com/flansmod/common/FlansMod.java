@@ -99,7 +99,11 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
+
+import cpw.mods.fml.common.Loader;
+
 import cpw.mods.fml.relauncher.Side;
+
 
 @Mod(modid = FlansMod.MODID, name = "Flan's Mod", version = FlansMod.VERSION, acceptableRemoteVersions = "@ALLOWEDVERSIONS@", guiFactory = "com.flansmod.client.gui.config.ModGuiFactory")
 public class FlansMod
@@ -121,6 +125,12 @@ public class FlansMod
     public static int teamsConfigInteger = 32;
     public static String teamsConfigString = "Hello!";
     public static boolean teamsConfigBoolean = false;
+	
+	//SmartMoving flag
+	 public static boolean isSmartMovingHere = false;
+	//CNPC flag
+	 public static boolean isCustomNPCsHere = false;
+	
 	@SidedProxy(clientSide = "com.flansmod.client.ClientProxy", serverSide = "com.flansmod.common.CommonProxy")
 	public static CommonProxy proxy;
 	//A standardised ticker for all bits of the mod to call upon if they need one
@@ -305,6 +315,13 @@ public class FlansMod
 
 		log("ICBM hooking complete.");
 		*/
+		
+		if (Loader.isModLoaded("SmartMoving"))
+			isSmartMovingHere = true;
+		if (Loader.isModLoaded("customnpcs"))
+			isCustomNPCsHere = true;
+			
+		
 	}
 
 	@SubscribeEvent

@@ -28,6 +28,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemLead;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -137,7 +138,8 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		//prevPosY = posY;
 		//prevPosZ = posZ;
 		
-
+		
+		
 		if(driver && riddenByEntity==null)
 		{
 			prevLooking = looking.clone();
@@ -178,6 +180,15 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			this.setDead();
 		}
 
+			
+		/** for NPC */
+		if(riddenByEntity != null)
+		{
+			boolean checkMyRider = driveable.passControl.checkPassengerInList(riddenByEntity, seatID);
+			if(!checkMyRider && !(riddenByEntity instanceof EntityPlayer))
+				npcMountMe(riddenByEntity);
+		}
+		
 		//Update gun delay ticker
 		if(gunDelay > 0)
 			gunDelay--;
@@ -653,7 +664,9 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		//Exit key pressed
 		if(key == 6 && riddenByEntity != null)
 		{
+			driveable.passControl.removePassengerFromList(seatID);
 			riddenByEntity.mountEntity(null);
+			riddenByEntity = null;
 		}
 	
 		if(key == 9) //Shoot
@@ -735,7 +748,8 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 			if(riddenByEntity != null && riddenByEntity instanceof EntityLiving && !(riddenByEntity instanceof EntityPlayer))
 			{
 				EntityLiving mob = (EntityLiving)riddenByEntity;
-				riddenByEntity.mountEntity(null);
+				npcUnmountMe(riddenByEntity);
+				//riddenByEntity.mountEntity(null);
 				mob.setLeashedToEntity(entityplayer, true);
 				return true;
 			}
@@ -757,6 +771,7 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 		if(riddenByEntity == null && !driveable.locked)
 		{
 			entityplayer.mountEntity(this);
+			driveable.passControl.addPassengerToList(entityplayer, seatID);
 			return true;
 		}
         return false;
@@ -777,7 +792,22 @@ public class EntitySeat extends Entity implements IControllable, IEntityAddition
 	@Override
 	public void setDead()
 	{
+		if(riddenByEntity != null) riddenByEntity.mountEntity(null);
 		super.setDead();
+	}
+	
+	/** for NPC */
+	public void npcMountMe(Entity entityRider)
+	{
+		driveable.passControl.addPassengerToList(entityRider, seatID);
+	}
+	
+	/** for NPC */
+	public void npcUnmountMe(Entity entityRider)	
+	{
+		driveable.passControl.removePassengerFromList(seatID);
+		entityRider.mountEntity(null);
+		riddenByEntity = null;
 	}
 
 	/**

@@ -8,8 +8,10 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.OpenGlHelper;
 
 import com.flansmod.client.tmt.ModelRendererTurbo;
+import com.flansmod.client.model.GunAnimations;
 import com.flansmod.common.driveables.DriveableType;
 import com.flansmod.common.driveables.EntityDriveable;
+
 
 public class ModelDriveable extends ModelBase 
 {
@@ -24,6 +26,8 @@ public class ModelDriveable extends ModelBase
 	
 	/** Set to true to use the old rotation order (ZYX) rather than (YZX) */
 	public boolean oldRotateOrder = false;
+	/** Gun animations fo mecha*/
+	public HashMap<EntityDriveable, GunAnimations> leftAnimations = new HashMap<EntityDriveable, GunAnimations>(), rightAnimations = new HashMap<EntityDriveable, GunAnimations>();
 	
 	/** For rendering a specific entity */
 	public void render(EntityDriveable driveable, float f1)

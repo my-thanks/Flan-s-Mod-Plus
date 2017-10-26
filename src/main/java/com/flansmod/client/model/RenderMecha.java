@@ -21,7 +21,9 @@ import net.minecraftforge.client.IItemRenderer.ItemRendererHelper;
 
 import com.flansmod.client.ClientProxy;
 import com.flansmod.client.FlansModResourceHandler;
+import com.flansmod.client.model.GunAnimations;
 import com.flansmod.common.FlansMod;
+import com.flansmod.common.driveables.EntityDriveable;
 import com.flansmod.common.driveables.DriveablePart;
 import com.flansmod.common.driveables.DriveablePosition;
 import com.flansmod.common.driveables.ShootPoint;
@@ -34,12 +36,14 @@ import com.flansmod.common.driveables.mechas.MechaItemType;
 import com.flansmod.common.driveables.mechas.MechaType;
 import com.flansmod.common.guns.GunType;
 import com.flansmod.common.guns.ItemGun;
+import com.flansmod.common.guns.ItemBullet;
 import com.flansmod.common.vector.Vector3f;
 
 public class RenderMecha extends Render implements IItemRenderer
 {
     private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
     private static final ItemRenderer renderer = new ItemRenderer(Minecraft.getMinecraft());
+	public int shootDelayLeft = 0, shootDelayRight = 0;
     
 	public RenderMecha()
 	{
@@ -310,7 +314,7 @@ public class RenderMecha extends Render implements IItemRenderer
 				//Left Leg Lower
 				GL11.glPushMatrix();
 				leftLegLowerPos = rotatedChildPosition(model.leftLegUpperOrigin, model.leftLegLowerOrigin, leftLegUpperRot);
-				GL11.glTranslatef(model.leftLegUpperOrigin.x, model.leftLegUpperOrigin.y, model.leftLegUpperOrigin.z);
+				GL11.glTranslatef(model.leftLegUpperOrigin.x, model.leftLegUpperOrigin.y, -model.leftLegLowerOrigin.z);
 				GL11.glTranslatef(leftLegLowerPos.x, -leftLegLowerPos.y, 0F);
 				GL11.glRotatef(leftLegLowerRot * 180F / 3.14159265F, 0F, 0F, 1F);
 				model.renderLeftAnimLegLower(scale, mecha, f1);
@@ -319,7 +323,7 @@ public class RenderMecha extends Render implements IItemRenderer
 				//Right Leg Lower
 				GL11.glPushMatrix();
 				rightLegLowerPos = rotatedChildPosition(model.rightLegUpperOrigin, model.rightLegLowerOrigin, rightLegUpperRot);
-				GL11.glTranslatef(model.rightLegUpperOrigin.x, model.rightLegUpperOrigin.y, model.rightLegUpperOrigin.z);
+				GL11.glTranslatef(model.rightLegUpperOrigin.x, model.rightLegUpperOrigin.y, -model.rightLegLowerOrigin.z);
 				GL11.glTranslatef(rightLegLowerPos.x, -rightLegLowerPos.y, 0F);
 				GL11.glRotatef(rightLegLowerRot * 180F / 3.14159265F, 0F, 0F, 1F);
 				model.renderRightAnimLegLower(scale, mecha, f1);
@@ -393,10 +397,27 @@ public class RenderMecha extends Render implements IItemRenderer
         TextureManager texturemanager = Minecraft.getMinecraft().getTextureManager();
 		Item item = stack.getItem();
 		
+		//Update gun animations
+		MechaType animationType = mecha.getMechaType();
+		ModelDriveable animationModel = (ModelDriveable)animationType.model;
+		GunAnimations animationGun = new GunAnimations();
+		
+		if(animationModel != null)
+			if(leftHand && animationModel.rightAnimations.containsKey((EntityDriveable)mecha))
+			{
+				animationGun = animationModel.leftAnimations.get((EntityDriveable)mecha);
+				animationGun.update();
+			}
+			else if(!leftHand && animationModel.rightAnimations.containsKey((EntityDriveable)mecha))
+			{
+				animationGun = animationModel.rightAnimations.get((EntityDriveable)mecha);
+				animationGun.update();
+			}
+		
+				
 		//Render tools
 		if(item instanceof ItemMechaAddon)
 		{
-
 			GL11.glRotatef(-90F, 0F, 0F, 1F);
 			GL11.glTranslatef(0F, 0F, 0F);
 			ItemMechaAddon toolItem = (ItemMechaAddon)item;
@@ -404,6 +425,9 @@ public class RenderMecha extends Render implements IItemRenderer
 			bindTexture(FlansModResourceHandler.getTexture(toolType));
 			if(toolType.model != null)
 			{
+				float toolScale = toolType.modelScale;
+				GL11.glPushMatrix();
+				GL11.glScalef(toolScale, toolScale, toolScale);
 				toolType.model.render(mecha, dT);
 		        GL11.glPushMatrix();
 				if((leftHand && mecha.leftMouseHeld) || (!leftHand && mecha.rightMouseHeld))
@@ -413,16 +437,19 @@ public class RenderMecha extends Render implements IItemRenderer
 				toolType.model.renderDrill(mecha, dT);
 				GL11.glPopMatrix();
 				toolType.model.renderSaw(mecha, dT, (leftHand && mecha.leftMouseHeld) || (!leftHand && mecha.rightMouseHeld));
+				GL11.glPopMatrix();
 			}
 		}
 		else if(item instanceof ItemGun && ((ItemGun)item).type.model != null)
-		{
-			GunType gunType = ((ItemGun)item).type;
-			ModelGun model = gunType.model;
+		{			
 			
+			GunType gunType = ((ItemGun)item).type;
+			ModelGun model = gunType.model;			
+			GL11.glPushMatrix();
 			GL11.glRotatef(-90F, 0F, 0F, 1F);
 			texturemanager.bindTexture(FlansModResourceHandler.getTexture(gunType));
-			ClientProxy.gunRenderer.renderGun(stack, gunType, 1F / 16F, model, leftHand ? mecha.leftAnimations : mecha.rightAnimations, 0F);
+			ClientProxy.gunRenderer.renderGun(stack, gunType, 1F / 16F, model, animationGun, 0F);
+			GL11.glPopMatrix();
 		}
 		else
 		{
