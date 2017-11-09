@@ -33,19 +33,6 @@ import net.smart.render.SmartRenderUtilities;
 import net.smart.render.SmartRenderModel;
 import net.smart.render.IModelPlayer;
 
-//import net.smart.render.statistics.SmartStatistics;
-//import net.smart.render.statistics.SmartStatisticsFactory;
-
-/*
-import net.smart.render.playerapi.SmartRender;
-import net.smart.render.playerapi.SmartRenderRenderPlayerBase;
-import net.smart.render.SmartRenderRender;
-
-import net.smart.render.ModelRotationRenderer;
-import net.smart.render.SmartRenderUtilities;
-import net.smart.render.IModelPlayer;
-*/
-
 public class ModelCustomArmourSmartRenderer
 {
 	
@@ -112,10 +99,7 @@ public class ModelCustomArmourSmartRenderer
 		Vector3f targetScale = new Vector3f(type.modelScale, type.modelScale, type.modelScale);
 		
 		GL11.glPushMatrix();
-			
-			//Vector3f targetScale = new Vector3f(type.modelScale * bipedHead.scaleX, type.modelScale * bipedHead.scaleY, type.modelScale * bipedHead.scaleZ);
-			
-			
+									
 			GL11.glScalef(targetScale.x, targetScale.y, targetScale.z);
 			rotateGlobalModelRotationRenderer(bipedOuter, bipedHead.ignoreBase || bipedNeck.ignoreBase || bipedBreast.ignoreBase || bipedTorso.ignoreBase, targetScale, f5);
 			rotateGlobalModelRotationRenderer(bipedTorso, bipedHead.ignoreBase || bipedNeck.ignoreBase || bipedBreast.ignoreBase, targetScale, f5);
@@ -132,8 +116,6 @@ public class ModelCustomArmourSmartRenderer
 		/** Render Body (Body Model) */
 
 		GL11.glPushMatrix();		
-			
-			//targetScale.set(type.modelScale * bipedBody.scaleX, type.modelScale * bipedBody.scaleY, type.modelScale * bipedBody.scaleZ);
 		
 			GL11.glScalef(targetScale.x, targetScale.y, targetScale.z);
 			rotateGlobalModelRotationRenderer(bipedOuter, bipedBody.ignoreBase || bipedTorso.ignoreBase, targetScale, f5);
@@ -150,9 +132,7 @@ public class ModelCustomArmourSmartRenderer
 		/** Render Left Arm Model */
 	
 		GL11.glPushMatrix();
-			
-			//targetScale.set(type.modelScale * bipedLeftArm.scaleX, type.modelScale * bipedLeftArm.scaleY, type.modelScale * bipedLeftArm.scaleZ);
-			
+						
 			GL11.glScalef(targetScale.x, targetScale.y, targetScale.z);
 			rotateGlobalModelRotationRenderer(bipedOuter, bipedLeftArm.ignoreBase || bipedLeftShoulder.ignoreBase || bipedBreast.ignoreBase || bipedTorso.ignoreBase, targetScale, f5);
 			rotateGlobalModelRotationRenderer(bipedTorso, bipedLeftArm.ignoreBase || bipedLeftShoulder.ignoreBase || bipedBreast.ignoreBase, targetScale, f5);
@@ -169,9 +149,7 @@ public class ModelCustomArmourSmartRenderer
 		/** Render Right Arm Model */
 		
 		GL11.glPushMatrix();
-			
-			//targetScale.set(type.modelScale * bipedRightArm.scaleX, type.modelScale * bipedRightArm.scaleY, type.modelScale * bipedRightArm.scaleZ);
-			
+						
 			GL11.glScalef(targetScale.x, targetScale.y, targetScale.z);
 			rotateGlobalModelRotationRenderer(bipedOuter, bipedRightArm.ignoreBase || bipedRightShoulder.ignoreBase || bipedBreast.ignoreBase || bipedTorso.ignoreBase,  targetScale, f5);
 			rotateGlobalModelRotationRenderer(bipedTorso, bipedRightArm.ignoreBase || bipedRightShoulder.ignoreBase || bipedBreast.ignoreBase, targetScale, f5);
@@ -188,9 +166,7 @@ public class ModelCustomArmourSmartRenderer
 		/** Render Left Leg Model */
 		
 		GL11.glPushMatrix();
-		
-			//targetScale.set(type.modelScale * bipedLeftLeg.scaleX, type.modelScale * bipedLeftLeg.scaleY, type.modelScale * bipedLeftLeg.scaleZ);
-			
+				
 			GL11.glScalef(targetScale.x, targetScale.y, targetScale.z);
 			rotateGlobalModelRotationRenderer(bipedOuter, bipedLeftLeg.ignoreBase || bipedPelvic.ignoreBase || bipedTorso.ignoreBase, targetScale, f5);
 			rotateGlobalModelRotationRenderer(bipedTorso, bipedLeftLeg.ignoreBase || bipedPelvic.ignoreBase, targetScale, f5);
@@ -206,9 +182,7 @@ public class ModelCustomArmourSmartRenderer
 		/** Render Right Leg Model */
 		
 		GL11.glPushMatrix();
-		
-			//targetScale.set(type.modelScale * bipedRightLeg.scaleX, type.modelScale * bipedRightLeg.scaleY, type.modelScale * bipedRightLeg.scaleZ);
-			
+					
 			GL11.glScalef(targetScale.x, targetScale.y, targetScale.z);
 			rotateGlobalModelRotationRenderer(bipedOuter, bipedRightLeg.ignoreBase || bipedPelvic.ignoreBase || bipedTorso.ignoreBase,  targetScale, f5);
 			rotateGlobalModelRotationRenderer(bipedTorso, bipedRightLeg.ignoreBase || bipedPelvic.ignoreBase, targetScale, f5);
@@ -224,9 +198,7 @@ public class ModelCustomArmourSmartRenderer
 		/** Render Skirt Front Model */
 		
 		GL11.glPushMatrix();
-		
-			//targetScale.set(type.modelScale, type.modelScale, type.modelScale);
-		
+				
 			GL11.glScalef(targetScale.x, targetScale.y, targetScale.z);
 			rotateGlobalModelRotationRenderer(bipedOuter, bipedLeftLeg.ignoreBase || bipedPelvic.ignoreBase || bipedTorso.ignoreBase,  targetScale, f5);
 			rotateGlobalModelRotationRenderer(bipedTorso, bipedLeftLeg.ignoreBase || bipedPelvic.ignoreBase, targetScale, f5);
@@ -252,9 +224,7 @@ public class ModelCustomArmourSmartRenderer
 		/** Render Skirt Back Model */
 
 		GL11.glPushMatrix();
-		
-			//targetScale.set(type.modelScale, type.modelScale, type.modelScale);
-			
+					
 			GL11.glScalef(targetScale.x, targetScale.y, targetScale.z);
 			rotateGlobalModelRotationRenderer(bipedOuter, bipedLeftLeg.ignoreBase || bipedPelvic.ignoreBase || bipedTorso.ignoreBase,  targetScale, f5);
 			rotateGlobalModelRotationRenderer(bipedTorso, bipedLeftLeg.ignoreBase || bipedPelvic.ignoreBase, targetScale, f5);
@@ -323,8 +293,6 @@ public class ModelCustomArmourSmartRenderer
 		if (!baseIgnore)
 		{					
 			GL11.glTranslatef(tagetToRot.rotationPointX / backScale.x * f5, tagetToRot.rotationPointY / backScale.y * f5,  tagetToRot.rotationPointZ / backScale.z * f5);
-
-			//GL11.glTranslatef(tagetToRot.offsetX / backScale.x * f5, tagetToRot.offsetY / backScale.y * f5, tagetToRot.offsetZ / backScale.z * f5);
 			
 			if(tagetToRot.ignoreSuperRotation)
 			{			
@@ -358,10 +326,7 @@ public class ModelCustomArmourSmartRenderer
 				if((tagetToRot.rotationOrder == XYZ || tagetToRot.rotationOrder == XZY) && tagetToRot.rotateAngleX != 0.0F)
 					GL11.glRotatef(tagetToRot.rotateAngleX * SmartRadiantToAngle, 1.0F, 0.0F, 0.0F);	
 			
-			GL11.glScalef(tagetToRot.scaleX, tagetToRot.scaleY, tagetToRot.scaleZ);
-			
-			//GL11.glTranslatef(tagetToRot.offsetX * f5, tagetToRot.offsetY * f5, tagetToRot.offsetZ * f5);					
-			//GL11.glTranslatef(tagetToRot.offsetX / backScale.x * f5, tagetToRot.offsetY / backScale.y * f5, tagetToRot.offsetZ / backScale.z * f5);
+			GL11.glScalef(tagetToRot.scaleX, tagetToRot.scaleY, tagetToRot.scaleZ);			
 			GL11.glTranslatef(tagetToRot.offsetX / backScale.x, tagetToRot.offsetY / backScale.y, tagetToRot.offsetZ / backScale.z);
 			
 		}

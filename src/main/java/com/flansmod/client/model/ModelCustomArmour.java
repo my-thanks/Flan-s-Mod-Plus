@@ -59,16 +59,24 @@ public class ModelCustomArmour extends ModelBiped
 		{	
 			boolean smartRenderTryToDo = ModelCustomArmourSmartRenderer.renderArmourSmart(entity, f5, type);
 			if (smartRenderTryToDo)
+			{
+				GL11.glBlendFunc(srcBlend, dstBlend);
+				GL11.glDisable(GL11.GL_BLEND);
 				return;
+			}
 		}
-		/*
+	
 		if (FlansMod.isCustomNPCsHere)
 		{		
 			boolean cNPCsRenderTryToDo = ModelCNPCsRenderer.renderCNPsArmour(entity, this, type, f5);	
 			if (cNPCsRenderTryToDo)
-			return;
+			{
+				GL11.glBlendFunc(srcBlend, dstBlend);
+				GL11.glDisable(GL11.GL_BLEND);
+				return;
+			}
 		}
-		*/
+
 		GL11.glPushMatrix();	
 		GL11.glScalef(type.modelScale, type.modelScale, type.modelScale);
 		
@@ -120,6 +128,13 @@ public class ModelCustomArmour extends ModelBiped
 			mod.rotateAngleY = bodyPart.rotateAngleY;
 			mod.rotateAngleZ = bodyPart.rotateAngleZ;
 			mod.render(f5);
+			//Undo transformations
+			mod.rotateAngleX = 0F;
+			mod.rotateAngleY = 0F;
+			mod.rotateAngleZ = 0F;
+			mod.rotationPointX = 0F;
+			mod.rotationPointY = 0F;
+			mod.rotationPointZ = 0F;
 		}
 	}
 	
