@@ -9,6 +9,7 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialLiquid;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.entity.Entity;
@@ -653,6 +654,9 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 
 					Block block = worldObj.getBlock(xTile, yTile, zTile);
 					Material mat = block.getMaterial();
+					int metadata = worldObj.getBlockMetadata(xTile, yTile, zTile);
+					float blockHardness = block.getBlockHardness(worldObj, xTile, yTile, zTile);
+					boolean glassHit = false;
 					//If the bullet breaks glass, and can do so according to FlansMod, do so.
 					if(type.breaksGlass && mat == Material.glass)
 					{
@@ -660,12 +664,28 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 						{
 							worldObj.setBlockToAir(xTile, yTile, zTile);
 							FlansMod.proxy.playBlockBreakSound(xTile, yTile, zTile, block);
+							glassHit = true;
 						}
 					}
-
+					if(type.damageVsBlocks > 0F && mat != Material.air && !(mat instanceof MaterialLiquid) && !glassHit && type.damageVsBlocks >= blockHardness)
+					{
+						//if(!worldObj.isRemote && worldObj.getGameRules().getGameRuleBooleanValue("doTileDrops"))
+							//for(ItemStack stack : block.getDrops(worldObj, xTile, yTile, zTile, metadata, 0))
+							//{
+								//worldObj.spawnEntityInWorld(new EntityItem(worldObj, xTile + 0.5F, yTile + 0.5F, zTile + 0.5F, stack));
+							//}
+							worldObj.func_147480_a(xTile, yTile, zTile, true);
+							penetratingPower -= blockHardness / 2F;
+					}
+					
+					if(!glassHit && (type.damageVsBlocks <= 0F || type.damageVsBlocks < blockHardness) && !(mat instanceof MaterialLiquid))
+					{
+						penetratingPower -= blockHardness;
+					}
+						
 					if(worldObj.isRemote)
 					{
-						if (block.getMaterial() != Material.air && this.type.explosionRadius<=0)
+						if (block.getMaterial() != Material.air && this.type.explosionRadius <= 0)
 						{
 							int num = 2 + this.rand.nextInt(3);
 							for(int i=0; i<num; i++)
@@ -688,8 +708,8 @@ public class EntityBullet extends EntityShootable implements IEntityAdditionalSp
 					//play sound when bullet hits block
 					if(type.hitSoundEnable)
 						PacketPlaySound.sendSoundPacket(posX, posY, posZ, type.hitSoundRange, dimension, type.hitSound, true);
-					setDead();
-					break;
+					//setDead();
+					//break;
 				}
 				if(penetratingPower <= 0F || (type.explodeOnImpact && ticksInAir > 1))
 				{

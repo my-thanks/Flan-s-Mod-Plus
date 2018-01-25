@@ -46,6 +46,7 @@ public class ShootableType extends InfoType
 	public float damageVsLiving    = 1.0F;
 	public float damageVsVehicles  = 1.0F;
 	public float damageVsPlanes    = 1.0F;
+	public float damageVsBlocks    = 0.0F;
 	public boolean readDamageVsPlayer = false;
 	public boolean readDamageVsEntity = false;
 	public boolean readDamageVsPlanes = false;
@@ -179,6 +180,10 @@ public class ShootableType extends InfoType
 			{
 				damageVsPlanes = Float.parseFloat(split[1]);
 				readDamageVsPlanes = true;
+			}
+			else if(split[0].equals("DamageVsBlocks"))
+			{
+				damageVsBlocks = Float.parseFloat(split[1]);
 			}
 
 			else if(split[0].equals("IgnoreArmorProbability"))
